@@ -1,9 +1,9 @@
-package com.hk47bit.gravitymod.init;
+package org.wever.gravitymod.init;
 
-import com.hk47bit.gravitymod.GravityMod;
-import com.hk47bit.gravitymod.capability.EntityGravityCap;
-import com.hk47bit.gravitymod.capability.EntityGravityCapProvider;
-import com.hk47bit.gravitymod.capability.EntityGravityStorage;
+import org.wever.gravitymod.GravityMod;
+import org.wever.gravitymod.capability.EntityGravityCap;
+import org.wever.gravitymod.capability.EntityGravityCapProvider;
+import org.wever.gravitymod.capability.EntityGravityStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.CapabilityManager;

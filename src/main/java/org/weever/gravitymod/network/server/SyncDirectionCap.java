@@ -1,26 +1,26 @@
-package com.hk47bit.gravitymod.network.server;
+package org.wever.gravitymod.network.server;
 
-import com.hk47bit.gravitymod.api.GravityDirection;
-import com.hk47bit.gravitymod.capability.EntityGravityCapProvider;
+import org.wever.gravitymod.capability.EntityGravityCapProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Direction;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class SyncDirectionCap {
 	private final int entityId;
-	private final GravityDirection direction;
+	private final Direction direction;
 	
-	public SyncDirectionCap(int entityId, GravityDirection direction) {
+	public SyncDirectionCap(int entityId, Direction direction) {
 		this.entityId = entityId;
 		this.direction = direction;
 	}
 	
 	public SyncDirectionCap(PacketBuffer buf) {
 		this.entityId = buf.readInt();
-		this.direction = buf.readEnum(GravityDirection.class);
+		this.direction = buf.readEnum(Direction.class);
 	}
 	
 	public void toBytes(PacketBuffer buf) {

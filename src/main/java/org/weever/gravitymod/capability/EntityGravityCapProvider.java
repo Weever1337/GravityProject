@@ -1,4 +1,4 @@
-package com.hk47bit.gravitymod.capability;
+package org.wever.gravitymod.capability;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.INBT;

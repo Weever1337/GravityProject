@@ -1,12 +1,12 @@
-package com.hk47bit.gravitymod.init;
+package org.wever.gravitymod.init;
 
-import com.hk47bit.gravitymod.GravityMod;
-import com.hk47bit.gravitymod.api.GravityDirection;
-import com.hk47bit.gravitymod.item.GravityChanger;
+import org.wever.gravitymod.GravityMod;
+import org.wever.gravitymod.item.GravityChanger;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
@@ -23,12 +23,12 @@ public class ModItems {
     };
 
     public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_UP = ITEMS.register("gravity_changer_up",
-            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(GravityDirection.UP.toString()).tab(GRAVITY_TAB)));
+            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.UP.getName()).tab(GRAVITY_TAB)));
     public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_DOWN = ITEMS.register("gravity_changer_down",
-            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(GravityDirection.DOWN.toString()).tab(GRAVITY_TAB)));
+            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.DOWN.getName()).tab(GRAVITY_TAB)));
     public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_EAST = ITEMS.register("gravity_changer_east",
-            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(GravityDirection.EAST.toString()).tab(GRAVITY_TAB)));
+            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.EAST.getName()).tab(GRAVITY_TAB)));
     public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_WEST = ITEMS.register("gravity_changer_west",
-            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(GravityDirection.WEST.toString()).tab(GRAVITY_TAB)));
+            () -> new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.WEST.getName()).tab(GRAVITY_TAB)));
 
 }

@@ -1,6 +1,5 @@
-package com.hk47bit.gravitymod.capability;
+package org.wever.gravitymod.capability;
 
-import com.hk47bit.gravitymod.api.GravityDirection;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -19,7 +18,7 @@ public class EntityGravityStorage implements Capability.IStorage<EntityGravityCa
     public void readNBT(Capability<EntityGravityCap> capability, EntityGravityCap instance, Direction side, INBT nbt) {
         CompoundNBT cnbt = (CompoundNBT) nbt;
         try {
-            instance.setGravityDirection(GravityDirection.valueOf(cnbt.getString("gravityDirection")));
+            instance.setGravityDirection(Direction.valueOf(cnbt.getString("gravityDirection").toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }

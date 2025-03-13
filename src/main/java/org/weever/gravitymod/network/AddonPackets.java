@@ -1,8 +1,8 @@
-package com.hk47bit.gravitymod.network;
+package org.wever.gravitymod.network;
 
 
-import com.hk47bit.gravitymod.GravityMod;
-import com.hk47bit.gravitymod.network.server.SyncDirectionCap;
+import org.wever.gravitymod.GravityMod;
+import org.wever.gravitymod.network.server.SyncDirectionCap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;

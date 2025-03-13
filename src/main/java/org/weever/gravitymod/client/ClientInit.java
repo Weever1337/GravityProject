@@ -1,7 +1,6 @@
-package com.hk47bit.gravitymod.init;
+package org.wever.gravitymod.client;
 
-import com.hk47bit.gravitymod.GravityMod;
-import com.hk47bit.gravitymod.client.ClientEvents;
+import org.wever.gravitymod.GravityMod;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,6 +11,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientInit {
     @SubscribeEvent
     public static void onFMLClientSetup(FMLClientSetupEvent event) {
-        ClientEvents.init(event.getMinecraftSupplier().get());
+//        ClientEvents.init(event.getMinecraftSupplier().get());
     }
 }

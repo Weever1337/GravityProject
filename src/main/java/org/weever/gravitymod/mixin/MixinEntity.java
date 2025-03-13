@@ -1,4 +1,4 @@
-package com.hk47bit.gravitymod.mixin;
+package org.wever.gravitymod.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity;
 
 @Mixin(Entity.class)
 public class MixinEntity {
-
 //    @Inject(method = "move", at = @At("HEAD"), cancellable = true)
 //    public void move(MoverType type, Vector3d p_213315_2_, CallbackInfo ci) {
 //        Entity entity = (Entity) (Object) this;
