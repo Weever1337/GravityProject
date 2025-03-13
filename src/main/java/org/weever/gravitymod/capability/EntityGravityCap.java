@@ -1,7 +1,7 @@
-package org.wever.gravitymod.capability;
+package org.weever.gravitymod.capability;
 
-import org.wever.gravitymod.network.AddonPackets;
-import org.wever.gravitymod.network.server.SyncDirectionCap;
+import org.weever.gravitymod.network.AddonPackets;
+import org.weever.gravitymod.network.server.SyncDirectionCap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
 

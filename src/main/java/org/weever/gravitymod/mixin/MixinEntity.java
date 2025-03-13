@@ -1,4 +1,4 @@
-package org.wever.gravitymod.mixin;
+package org.weever.gravitymod.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 

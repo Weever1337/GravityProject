@@ -1,6 +1,6 @@
-package org.wever.gravitymod.client;
+package org.weever.gravitymod.client;
 
-import org.wever.gravitymod.GravityMod;
+import org.weever.gravitymod.GravityMod;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.Mod;

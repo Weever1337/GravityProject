@@ -1,6 +1,6 @@
-package org.wever.gravitymod.item;
+package org.weever.gravitymod.item;
 
-import org.wever.gravitymod.capability.EntityGravityCapProvider;
+import org.weever.gravitymod.capability.EntityGravityCapProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

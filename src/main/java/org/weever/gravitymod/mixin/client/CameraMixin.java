@@ -1,4 +1,4 @@
-package org.wever.gravitymod.mixin.client;
+package org.weever.gravitymod.mixin.client;
 
 import net.minecraft.util.Direction;
 import org.spongepowered.asm.mixin.Final;
@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import org.wever.gravitymod.api.GravityAPI;
+import org.weever.gravitymod.api.GravityAPI;
 import com.hk47bit.gravitymod.util.RotationUtil;
 
 import net.minecraft.client.renderer.ActiveRenderInfo;

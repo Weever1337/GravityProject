@@ -1,7 +1,7 @@
-package org.wever.gravitymod.effects;
+package org.weever.gravitymod.effects;
 
-import org.wever.gravitymod.GravityMod;
-import org.wever.gravitymod.capability.EntityGravityCapProvider;
+import org.weever.gravitymod.GravityMod;
+import org.weever.gravitymod.capability.EntityGravityCapProvider;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;

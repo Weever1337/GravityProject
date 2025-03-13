@@ -1,6 +1,6 @@
-package org.wever.gravitymod.network.server;
+package org.weever.gravitymod.network.server;
 
-import org.wever.gravitymod.capability.EntityGravityCapProvider;
+import org.weever.gravitymod.capability.EntityGravityCapProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;

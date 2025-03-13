@@ -1,7 +1,7 @@
-package org.wever.gravitymod.init;
+package org.weever.gravitymod.init;
 
-import org.wever.gravitymod.GravityMod;
-import org.wever.gravitymod.item.GravityChanger;
+import org.weever.gravitymod.GravityMod;
+import org.weever.gravitymod.item.GravityChanger;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;

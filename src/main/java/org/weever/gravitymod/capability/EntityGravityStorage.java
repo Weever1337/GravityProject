@@ -1,4 +1,4 @@
-package org.wever.gravitymod.capability;
+package org.weever.gravitymod.capability;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

@@ -1,7 +1,7 @@
-package org.wever.gravitymod.init;
+package org.weever.gravitymod.init;
 
-import org.wever.gravitymod.GravityMod;
-import org.wever.gravitymod.effects.RotateUpEffect;
+import org.weever.gravitymod.GravityMod;
+import org.weever.gravitymod.effects.RotateUpEffect;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
 import net.minecraftforge.fml.RegistryObject;

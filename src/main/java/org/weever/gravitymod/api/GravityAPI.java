@@ -1,7 +1,7 @@
-package org.wever.gravitymod.api;
+package org.weever.gravitymod.api;
 
-import org.wever.gravitymod.capability.EntityGravityCap;
-import org.wever.gravitymod.capability.EntityGravityCapProvider;
+import org.weever.gravitymod.capability.EntityGravityCap;
+import org.weever.gravitymod.capability.EntityGravityCapProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
 

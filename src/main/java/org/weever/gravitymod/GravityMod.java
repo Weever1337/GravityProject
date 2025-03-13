@@ -1,12 +1,12 @@
-package org.wever.gravitymod;
+package org.weever.gravitymod;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.wever.gravitymod.init.CapabilityInit;
-import org.wever.gravitymod.init.ModEffects;
-import org.wever.gravitymod.init.ModItems;
-import org.wever.gravitymod.network.AddonPackets;
+import org.weever.gravitymod.init.CapabilityInit;
+import org.weever.gravitymod.init.ModEffects;
+import org.weever.gravitymod.init.ModItems;
+import org.weever.gravitymod.network.AddonPackets;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;

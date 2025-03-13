@@ -5,10 +5,9 @@
   "refmap": "mixins.gravitymod.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinEntity"
+    "org.wever.gravitymod.mixin.MixinEntity"
   ],
   "client": [
-    "client.CameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1
