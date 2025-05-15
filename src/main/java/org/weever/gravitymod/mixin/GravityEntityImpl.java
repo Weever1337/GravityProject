@@ -14,7 +14,6 @@ import org.weever.gravitymod.capability.EntityGravityCapProvider;
 public abstract class GravityEntityImpl implements IGravityEntity {
     @Shadow
     private Vector3d position;
-
     @Shadow
     private float eyeHeight;
 
@@ -29,12 +28,13 @@ public abstract class GravityEntityImpl implements IGravityEntity {
 
     @Override
     public double getEyeX() {
-        if (getGravityDirection() == GravityDirection.EAST) {
-            return this.position.x + (double) this.eyeHeight;
-        } else if (getGravityDirection() == GravityDirection.WEST) {
-            return this.position.x - (double) this.eyeHeight;
-        } else {
-            return this.position.x;
+        switch (getGravityDirection()) {
+            case EAST:
+                return this.position.x + (double) this.eyeHeight;
+            case WEST:
+                return this.position.x - (double) this.eyeHeight;
+            default:
+                return this.position.x;
         }
     }
 
@@ -46,75 +46,104 @@ public abstract class GravityEntityImpl implements IGravityEntity {
     @Override
     public Vector3d multiplyDeltaMovementBySpeedFactor(Vector3d deltaMovement, float speedFactor) {
         double x = deltaMovement.x;
-        if (this.getGravityDirection() != GravityDirection.EAST && this.getGravityDirection() != GravityDirection.WEST) {
-            x *= speedFactor;
-        }
         double y = deltaMovement.y;
-        if (this.getGravityDirection() != GravityDirection.DOWN) {
-            y *= speedFactor;
-        }
         double z = deltaMovement.z;
+
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                y *= speedFactor;
+                z *= speedFactor;
+                break;
+            case UP:
+            case DOWN:
+            default:
+                x *= speedFactor;
+                z *= speedFactor;
+                break;
+        }
         return new Vector3d(x, y, z);
     }
 
     @Override
-    public double getSwimProbability(Vector3d vector3d2) {
-        float result = 0;
-        if (this.getGravityDirection() == GravityDirection.EAST || this.getGravityDirection() == GravityDirection.WEST) {
-            result += vector3d2.x * vector3d2.x;
-        } else {
-            result += vector3d2.x * vector3d2.x * 0.2;
+    public double getSwimProbability(Vector3d vector3d) {
+        double xSqr = vector3d.x * vector3d.x;
+        double ySqr = vector3d.y * vector3d.y;
+        double zSqr = vector3d.z * vector3d.z;
+
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return xSqr + (ySqr + zSqr) * 0.2D;
+            case UP:
+            case DOWN:
+            default:
+                return ySqr + (xSqr + zSqr) * 0.2D;
         }
-        if (this.getGravityDirection() == GravityDirection.DOWN) {
-            result += vector3d2.y * vector3d2.y;
-        } else {
-            result += vector3d2.y * vector3d2.y * 0.2;
-        }
-        result += vector3d2.z * vector3d2.z * 0.2;
-        return result;
     }
 
     @Override
     public void handleHorizontalCollide(Vector3d requestedDeltaMovement, Vector3d requestedMove, Vector3d actualMove) {
-        if (this.getGravityDirection() != GravityDirection.DOWN) {
-            if (!MathHelper.equal(requestedMove.y, actualMove.y)) {
-                this.setDeltaMovement(requestedDeltaMovement.x, 0, requestedDeltaMovement.z);
-            }
-        }
-        if (this.getGravityDirection() != GravityDirection.EAST && this.getGravityDirection() != GravityDirection.WEST) {
-            if (!MathHelper.equal(requestedMove.x, actualMove.x)) {
-                this.setDeltaMovement(0, requestedDeltaMovement.y, requestedDeltaMovement.z);
-            }
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                if (!MathHelper.equal(requestedMove.y, actualMove.y)) {
+                    this.setDeltaMovement(requestedDeltaMovement.x, 0, requestedDeltaMovement.z);
+                }
+                if (!MathHelper.equal(requestedMove.z, actualMove.z)) {
+                    this.setDeltaMovement(requestedDeltaMovement.x, requestedDeltaMovement.y, 0);
+                }
+                break;
+            case UP:
+            case DOWN:
+            default:
+                if (!MathHelper.equal(requestedMove.x, actualMove.x)) {
+                    this.setDeltaMovement(0, requestedDeltaMovement.y, requestedDeltaMovement.z);
+                }
+                if (!MathHelper.equal(requestedMove.z, actualMove.z)) {
+                    this.setDeltaMovement(requestedDeltaMovement.x, requestedDeltaMovement.y, 0);
+                }
+                break;
         }
     }
 
     @Override
     public double getVerticalCoordinate() {
-        if (getGravityDirection() == GravityDirection.EAST || getGravityDirection() == GravityDirection.WEST) {
-            return getX();
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return getX();
+            default:
+                return getY();
         }
-        return getY();
     }
 
     @Override
     public double getVerticalDelta(Vector3d vector3d) {
-        GravityDirection dir = getGravityDirection();
-        if (dir == GravityDirection.EAST) {
-            return vector3d.x;
-        } else if (dir == GravityDirection.WEST) {
-            return -vector3d.x;
-        } else if (dir == GravityDirection.UP) {
-            return -vector3d.y;
+        switch (getGravityDirection()) {
+            case EAST:
+                return vector3d.x;
+            case WEST:
+                return -vector3d.x;
+            case UP:
+                return -vector3d.y;
+            case DOWN:
+            default:
+                return vector3d.y;
         }
-        return vector3d.y;
     }
 
     @Override
     public double getHorizontalDistanceSquared(Vector3d vector) {
-        if (this.getGravityDirection() == GravityDirection.EAST || this.getGravityDirection() == GravityDirection.WEST) {
-            return vector.y * vector.y + vector.z * vector.z;
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return vector.y * vector.y + vector.z * vector.z;
+            case UP:
+            case DOWN:
+            default:
+                return vector.x * vector.x + vector.z * vector.z;
         }
-        return vector.x * vector.x + vector.z * vector.z;
     }
 
     @Override
@@ -122,26 +151,32 @@ public abstract class GravityEntityImpl implements IGravityEntity {
         double d0 = input.lengthSqr();
         if (d0 < 1.0E-7D) {
             return Vector3d.ZERO;
-        } else {
-            Vector3d vector3d = (d0 > 1.0D ? input.normalize() : input).scale(speed);
-            float f = MathHelper.sin(yRot * ((float) Math.PI / 180F));
-            float f1 = MathHelper.cos(yRot * ((float) Math.PI / 180F));
-            if (this.getGravityDirection() == GravityDirection.EAST) {
-                return new Vector3d(vector3d.y, -(vector3d.z * (double) f1 + vector3d.x * (double) f), -(vector3d.x * (double) f1 - vector3d.z * (double) f));
-            } else if (this.getGravityDirection() == GravityDirection.WEST) {
-                return new Vector3d(vector3d.y, -(vector3d.z * (double) f1 + vector3d.x * (double) f), (vector3d.x * (double) f1 - vector3d.z * (double) f));
-            } else {
-                return new Vector3d(vector3d.x * (double) f1 - vector3d.z * (double) f, vector3d.y, vector3d.z * (double) f1 + vector3d.x * (double) f);
-            }
+        }
+        Vector3d vector3d = (d0 > 1.0D ? input.normalize() : input).scale(speed);
+        float f = MathHelper.sin(yRot * ((float) Math.PI / 180F));
+        float f1 = MathHelper.cos(yRot * ((float) Math.PI / 180F));
+
+        switch (this.getGravityDirection()) {
+            case EAST:
+                return new Vector3d(vector3d.y, -(vector3d.z * f1 + vector3d.x * f), -(vector3d.x * f1 - vector3d.z * f));
+            case WEST:
+                return new Vector3d(vector3d.y, -(vector3d.z * f1 + vector3d.x * f), (vector3d.x * f1 - vector3d.z * f));
+            case UP:
+            case DOWN:
+            default:
+                return new Vector3d(vector3d.x * f1 - vector3d.z * f, vector3d.y, vector3d.z * f1 + vector3d.x * f);
         }
     }
 
     @Override
     public double verticalDelta(Vector3d actualMove) {
-        if (getGravityDirection() == GravityDirection.EAST || getGravityDirection() == GravityDirection.WEST) {
-            return actualMove.x;
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return actualMove.x;
+            default:
+                return actualMove.y;
         }
-        return actualMove.y;
     }
 
     @Override
@@ -153,59 +188,74 @@ public abstract class GravityEntityImpl implements IGravityEntity {
     @Override
     public void setGravityDirection(GravityDirection gravityDirection) {
         Entity entity = (Entity) (Object) this;
-        entity.getCapability(EntityGravityCapProvider.CAPABILITY).ifPresent(cap ->
-        {
-            cap.setGravityDirection(gravityDirection);
-        });
+        entity.getCapability(EntityGravityCapProvider.CAPABILITY).ifPresent(cap -> cap.setGravityDirection(gravityDirection));
     }
 
     @Override
     public boolean verticalCollision(Vector3d moveRequest, Vector3d actualMove) {
-        if (getGravityDirection() == GravityDirection.EAST || getGravityDirection() == GravityDirection.WEST) {
-            return !MathHelper.equal(moveRequest.x, actualMove.x);
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return !MathHelper.equal(moveRequest.x, actualMove.x);
+            default:
+                return !MathHelper.equal(moveRequest.y, actualMove.y);
         }
-        return !MathHelper.equal(moveRequest.y, actualMove.y);
     }
 
     @Override
     public boolean horizontalCollision(Vector3d moveRequest, Vector3d actualMove) {
-        if (getGravityDirection() == GravityDirection.EAST || getGravityDirection() == GravityDirection.WEST) {
-            return !MathHelper.equal(moveRequest.y, actualMove.y) || !MathHelper.equal(moveRequest.z, actualMove.z);
+        switch (getGravityDirection()) {
+            case EAST:
+            case WEST:
+                return !MathHelper.equal(moveRequest.y, actualMove.y) || !MathHelper.equal(moveRequest.z, actualMove.z);
+            default:
+                return !MathHelper.equal(moveRequest.x, actualMove.x) || !MathHelper.equal(moveRequest.z, actualMove.z);
         }
-        return !MathHelper.equal(moveRequest.x, actualMove.x) || !MathHelper.equal(moveRequest.z, actualMove.z);
     }
 
     @Override
     public boolean isOnGroundBasedOnMove(boolean verticalCollision, Vector3d requestedMove) {
-        if (getGravityDirection() == GravityDirection.EAST) {
-            return verticalCollision && requestedMove.x < 0;
+        if (!verticalCollision) return false;
+
+        switch (getGravityDirection()) {
+            case EAST:
+                return requestedMove.x < 0;
+            case WEST:
+                return requestedMove.x > 0;
+            case UP:
+                return requestedMove.y > 0;
+            case DOWN:
+            default:
+                return requestedMove.y < 0;
         }
-        if (getGravityDirection() == GravityDirection.WEST) {
-            return verticalCollision && requestedMove.x > 0;
-        }
-        return verticalCollision && requestedMove.y < 0;
     }
 
     @Override
     public double getEyeVerticalCoordinate() {
-        if (getGravityDirection() == GravityDirection.EAST) {
-            return this.position.x + this.eyeHeight;
-        } else if (getGravityDirection() == GravityDirection.WEST) {
-            return this.position.x - this.eyeHeight;
+        switch (getGravityDirection()) {
+            case EAST:
+                return this.position.x + this.eyeHeight;
+            case WEST:
+                return this.position.x - this.eyeHeight;
+            case UP:
+            case DOWN:
+            default:
+                return this.position.y + (double) this.eyeHeight;
         }
-        return this.position.y + (double) this.eyeHeight;
     }
 
     @Override
-    public Vector3d setVerticalCoordinate(float deltaY, Vector3d vector3d) {
-        GravityDirection direction = getGravityDirection();
-        if (direction == GravityDirection.EAST) {
-            return new Vector3d(deltaY, vector3d.y, vector3d.z);
-        } else if (direction == GravityDirection.WEST) {
-            return new Vector3d(-deltaY, vector3d.y, vector3d.z);
-        } else if (getGravityDirection() == GravityDirection.UP) {
-            return new Vector3d(vector3d.x, -deltaY, vector3d.z);
+    public Vector3d setVerticalCoordinate(float delta, Vector3d vector3d) {
+        switch (getGravityDirection()) {
+            case EAST:
+                return new Vector3d(delta, vector3d.y, vector3d.z);
+            case WEST:
+                return new Vector3d(-delta, vector3d.y, vector3d.z);
+            case UP:
+                return new Vector3d(vector3d.x, -delta, vector3d.z);
+            case DOWN:
+            default:
+                return new Vector3d(vector3d.x, delta, vector3d.z);
         }
-        return new Vector3d(vector3d.x, deltaY, vector3d.z);
     }
 }

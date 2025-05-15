@@ -87,11 +87,14 @@ public abstract class LivingEntityMixin extends EntityMixin implements IGravityE
     @Shadow
     protected abstract float getJumpPower();
 
-    @Shadow public float flyingSpeed;
+    @Shadow
+    public float flyingSpeed;
 
-    @Shadow public abstract boolean isSleeping();
+    @Shadow
+    public abstract boolean isSleeping();
 
-    @Shadow protected abstract void goDownInWater();
+    @Shadow
+    protected abstract void goDownInWater();
 
     /**
      * @author
@@ -248,22 +251,47 @@ public abstract class LivingEntityMixin extends EntityMixin implements IGravityE
                 } else if (this.level.isClientSide && !this.level.hasChunkAt(groundPos)) {
                     verticalMovement = this.getVerticalCoordinate() > 0.0D ? -0.1D : 0.0D;
                 } else if (!this.isNoGravity()) {
-                    GravityDirection gravity = getGravityDirection();
-                    if (gravity == GravityDirection.WEST || gravity == GravityDirection.UP) {
-                        verticalMovement += gravityAcceleration;
-                    } else {
-                        verticalMovement -= gravityAcceleration;
+                    switch (getGravityDirection()) {
+                        case WEST:
+                        case UP:
+                            verticalMovement += gravityAcceleration;
+                            break;
+                        case EAST:
+                        case DOWN:
+                        default:
+                            verticalMovement -= gravityAcceleration;
+                            break;
                     }
                 }
 
-                GravityDirection gravity = getGravityDirection();
-                if (gravity == GravityDirection.EAST || gravity == GravityDirection.WEST) {
-                    this.setDeltaMovement(verticalMovement * 0.98F, movement.y * friction, movement.z * friction);
-                } else if (gravity == GravityDirection.UP) {
-                    this.setDeltaMovement(movement.x * friction, -verticalMovement * 0.98F, movement.z * friction);
-                } else {
-                    this.setDeltaMovement(movement.x * friction, verticalMovement * 0.98F, movement.z * friction);
+                double newX = movement.x;
+                double newY = movement.y;
+                double newZ = movement.z;
+
+                switch (getGravityDirection()) {
+                    case EAST:
+                        newX = verticalMovement * 0.98F;
+                        newY *= friction;
+                        newZ *= friction;
+                        break;
+                    case WEST:
+                        newX = -verticalMovement * 0.98F;
+                        newY *= friction;
+                        newZ *= friction;
+                        break;
+                    case UP:
+                        newX *= friction;
+                        newY = -verticalMovement * 0.98F;
+                        newZ *= friction;
+                        break;
+                    case DOWN:
+                    default:
+                        newX *= friction;
+                        newY = verticalMovement * 0.98F;
+                        newZ *= friction;
+                        break;
                 }
+                this.setDeltaMovement(newX, newY, newZ);
             }
         }
         this.calculateEntityAnimation((LivingEntity) (Object) this, this instanceof IFlyingAnimal);
@@ -275,42 +303,45 @@ public abstract class LivingEntityMixin extends EntityMixin implements IGravityE
      */
     @Overwrite
     protected void jumpFromGround() {
-        float f = this.getJumpPower();
+        float jumpPower = this.getJumpPower();
         if (this.hasEffect(Effects.JUMP)) {
-            f += 0.1F * (float) (this.getEffect(Effects.JUMP).getAmplifier() + 1);
+            jumpPower += 0.1F * (float) (this.getEffect(Effects.JUMP).getAmplifier() + 1);
         }
 
-        Vector3d vector3d = this.getDeltaMovement();
+        Vector3d currentDelta = this.getDeltaMovement();
         GravityDirection direction = this.getGravityDirection();
+
         switch (direction) {
             case EAST:
-                this.setDeltaMovement(f, vector3d.y, vector3d.z);
+                this.setDeltaMovement(jumpPower, currentDelta.y, currentDelta.z);
                 break;
             case WEST:
-                this.setDeltaMovement(-f, vector3d.y, vector3d.z);
+                this.setDeltaMovement(-jumpPower, currentDelta.y, currentDelta.z);
                 break;
             case UP:
-                this.setDeltaMovement(vector3d.x, -f, vector3d.z);
+                this.setDeltaMovement(currentDelta.x, -jumpPower, currentDelta.z);
                 break;
+            case DOWN:
             default:
-                this.setDeltaMovement(vector3d.x, f, vector3d.z);
+                this.setDeltaMovement(currentDelta.x, jumpPower, currentDelta.z);
                 break;
         }
 
         if (this.isSprinting()) {
-            float f1 = this.yRot * ((float) Math.PI / 180F);
+            float yRotRad = this.yRot * ((float) Math.PI / 180F);
+            float sprintBoost = 0.2F;
+
             switch (direction) {
                 case EAST:
-                    this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -MathHelper.cos(f1) * 0.2F, MathHelper.sin(f1) * 0.2F));
+                    this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -MathHelper.cos(yRotRad) * sprintBoost, MathHelper.sin(yRotRad) * sprintBoost));
                     break;
                 case WEST:
-                    this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -MathHelper.cos(f1) * 0.2F, -MathHelper.sin(f1) * 0.2F));
+                    this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -MathHelper.cos(yRotRad) * sprintBoost, -MathHelper.sin(yRotRad) * sprintBoost));
                     break;
                 case UP:
-                    this.setDeltaMovement(this.getDeltaMovement().add(-MathHelper.sin(f1) * 0.2F, 0.0D, MathHelper.cos(f1) * 0.2F)); // todo: fix, cuz it's just copy of default
-                    break;
+                case DOWN:
                 default:
-                    this.setDeltaMovement(this.getDeltaMovement().add(-MathHelper.sin(f1) * 0.2F, 0.0D, MathHelper.cos(f1) * 0.2F));
+                    this.setDeltaMovement(this.getDeltaMovement().add(-MathHelper.sin(yRotRad) * sprintBoost, 0.0D, MathHelper.cos(yRotRad) * sprintBoost));
                     break;
             }
         }

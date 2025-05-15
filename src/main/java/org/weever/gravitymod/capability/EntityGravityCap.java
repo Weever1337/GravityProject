@@ -1,34 +1,38 @@
 package org.weever.gravitymod.capability;
 
-import org.weever.gravitymod.network.AddonPackets;
-import org.weever.gravitymod.network.server.SyncDirectionCap;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Direction;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import org.weever.gravitymod.api.GravityDirection;
+import org.weever.gravitymod.network.ModPackets;
+import org.weever.gravitymod.network.server.SyncDirectionCap;
 
 public class EntityGravityCap {
     private final Entity entity;
-    public Direction direction = Direction.DOWN;
+    private GravityDirection direction = GravityDirection.DOWN;
 
-    public void setGravityDirection(Direction direction){
-        this.direction = direction;
-        if (!entity.level.isClientSide()) {
-        	AddonPackets.sendToClientsTrackingAndSelf(new SyncDirectionCap(entity.getId(), direction), entity);
-        } else {
-//            AddonPackets.sendToServer(new SyncDirectionCap(entity.getId(), direction), entity.getServerPlayer());
-        }
-        
-//        if (direction == Direction.DOWN){
-//            entity.setNoGravity(true);
-//        } else {
-//            entity.setNoGravity(false);
-//        }
+    public EntityGravityCap(Entity entity) {
+        this.entity = entity;
     }
 
-    public Direction getGravityDirection() {
+    public GravityDirection getGravityDirection() {
         return direction;
     }
 
-    public EntityGravityCap(Entity entity){
-        this.entity = entity;
+    public void setGravityDirection(GravityDirection direction) {
+        this.direction = direction;
+        if (!entity.level.isClientSide()) {
+            ModPackets.sendToClientsTrackingAndSelf(new SyncDirectionCap(entity.getId(), direction), entity);
+        }
+
+        //        if (direction == Direction.DOWN){
+        //            entity.setNoGravity(true);
+        //        } else {
+        //            entity.setNoGravity(false);
+        //        }
+    }
+
+    public void syncWithClient() {
+        ServerPlayerEntity player = (ServerPlayerEntity) this.entity;
+        ModPackets.sendToClient(new SyncDirectionCap(entity.getId(), this.getGravityDirection()), player);
     }
 }

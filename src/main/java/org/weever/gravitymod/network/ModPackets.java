@@ -11,7 +11,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.weever.gravitymod.GravityMod;
 import org.weever.gravitymod.network.server.SyncDirectionCap;
 
-public class AddonPackets {
+public class ModPackets {
     private static final String PROTOCOL_VERSION = "1";
     private static SimpleChannel channel;
     private static int ID = 0;

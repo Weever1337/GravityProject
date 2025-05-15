@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 public abstract class OverlayRendererMixin {
     /**
      * @author Weever1337
-     * @reason Remove the vanilla overlay block detection and replace it with a custom one that affects gravity users.
+     * @reason Remove the vanilla overlay block detection and replace it with a custom one that affects gravity users. This version is clearer and more robust.
      */
     @Overwrite
     private static @Nullable Pair<BlockState, BlockPos> getOverlayBlock(PlayerEntity player) {
@@ -30,67 +30,45 @@ public abstract class OverlayRendererMixin {
         IGravityEntity gravityEntity = (IGravityEntity) player;
         GravityDirection gravity = gravityEntity.getGravityDirection();
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        float width = player.getBbWidth() * 0.8F;
+
+        float horizontalSize = player.getBbWidth() * 0.8F;
+        float verticalSize = 0.1F;
+
         Vector3d eyePos = player.getEyePosition(1.0F);
 
         for (int i = 0; i < 8; ++i) {
-            float xFactor = (i % 2) - 0.5F;
-            float yFactor = ((i >> 1) % 2) - 0.5F;
-            float zFactor = ((i >> 2) % 2) - 0.5F;
+            float h_offset1 = ((i & 1) * 2 - 1) * 0.5F;
+            float v_offset = (((i >> 1) & 1) * 2 - 1) * 0.5F;
+            float h_offset2 = (((i >> 2) & 1) * 2 - 1) * 0.5F;
 
-            double x = eyePos.x;
-            double y = eyePos.y;
-            double z = eyePos.z;
+            double checkX = eyePos.x;
+            double checkY = eyePos.y;
+            double checkZ = eyePos.z;
 
             switch (gravity) {
                 case EAST:
-                    x += yFactor * 0.1F;
-                    y += xFactor * width;
-                    z += zFactor * width;
-                    break;
                 case WEST:
-                    x -= yFactor * 0.1F;
-                    y += xFactor * width;
-                    z += zFactor * width;
+                    checkX += v_offset * verticalSize;
+                    checkY += h_offset1 * horizontalSize;
+                    checkZ += h_offset2 * horizontalSize;
                     break;
                 case UP:
-                    x += xFactor * width;
-                    y += zFactor * width;
-                    z -= yFactor * 0.1F;
-                    break;
+                case DOWN:
                 default:
-                    x += xFactor * width;
-                    y += yFactor * 0.1F;
-                    z += zFactor * width;
+                    checkX += h_offset1 * horizontalSize;
+                    checkY += v_offset * verticalSize;
+                    checkZ += h_offset2 * horizontalSize;
                     break;
             }
 
-            mutablePos.set(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
+            mutablePos.set(MathHelper.floor(checkX), MathHelper.floor(checkY), MathHelper.floor(checkZ));
             BlockState state = player.level.getBlockState(mutablePos);
 
-            if (state.getRenderShape() != BlockRenderType.INVISIBLE &&
-                    state.isViewBlocking(player.level, mutablePos) &&
-                    isBlockActuallyCoveringPlayer(player, mutablePos, gravity)) {
-                return Pair.of(state, mutablePos.immutable()); // TODO: Fix some problems with it. It happens randomly (for me now).
+            if (state.getRenderShape() != BlockRenderType.INVISIBLE && state.isViewBlocking(player.level, mutablePos)) {
+                return Pair.of(state, mutablePos.immutable());
             }
         }
 
         return null;
-    }
-
-    private static boolean isBlockActuallyCoveringPlayer(PlayerEntity player, BlockPos pos, GravityDirection gravity) {
-        Vector3d eyePos = player.getEyePosition(1.0F);
-        Vector3d blockCenter = new Vector3d(
-                pos.getX() + 0.5,
-                pos.getY() + 0.5,
-                pos.getZ() + 0.5
-        );
-
-        Vector3d direction = eyePos.subtract(blockCenter).normalize();
-
-        Vector3d lookVec = player.getLookAngle();
-        double dot = direction.dot(lookVec);
-
-        return dot > 0;
     }
 }

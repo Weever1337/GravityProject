@@ -1,13 +1,20 @@
 {
   "required": true,
   "minVersion": "0.7",
-  "package": "com.hk47bit.gravitymod.mixin",
+  "package": "org.weever.gravitymod.mixin",
   "refmap": "mixins.gravitymod.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "org.wever.gravitymod.mixin.MixinEntity"
+    "EntityMixin",
+    "GravityEntityImpl",
+    "LivingEntityMixin",
+    "PlayerEntityMixin"
   ],
   "client": [
+    "client.ActiveRenderInfoMixin",
+    "client.ClientPlayerEntityMixin",
+    "client.GameRendererMixin",
+    "client.OverlayRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
