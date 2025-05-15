@@ -9,9 +9,12 @@ import org.weever.gravitymod.api.GravityAPI;
 import org.weever.gravitymod.api.GravityDirection;
 
 @Mod.EventBusSubscriber(modid = GravityMod.MODID)
-public class RotateUpEffect extends Effect {
-    public RotateUpEffect(EffectType type, int liquidColor) {
+public class GravityRotateEffect extends Effect {
+    private final GravityDirection direction;
+
+    public GravityRotateEffect(EffectType type, int liquidColor, GravityDirection gravityDirection) {
         super(type, liquidColor);
+        this.direction = gravityDirection;
     }
 
     //    @Override
@@ -22,7 +25,7 @@ public class RotateUpEffect extends Effect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (!entity.level.isClientSide()) {
-            GravityAPI.setGravityDirection(entity, GravityDirection.UP);
+            GravityAPI.setGravityDirection(entity, direction);
         }
     }
 }
