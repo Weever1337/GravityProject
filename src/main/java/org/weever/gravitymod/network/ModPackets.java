@@ -1,8 +1,6 @@
 package org.weever.gravitymod.network;
 
 
-import org.weever.gravitymod.GravityMod;
-import org.weever.gravitymod.network.server.SyncDirectionCap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -10,6 +8,8 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import org.weever.gravitymod.GravityMod;
+import org.weever.gravitymod.network.server.SyncDirectionCap;
 
 public class AddonPackets {
     private static final String PROTOCOL_VERSION = "1";
@@ -21,18 +21,9 @@ public class AddonPackets {
     }
 
     public static void init() {
-        channel = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(GravityMod.MOD_ID, "server_channel"))
-                .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-                .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-                .networkProtocolVersion(() -> PROTOCOL_VERSION)
-                .simpleChannel();
+        channel = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(GravityMod.MODID, "server_channel")).clientAcceptedVersions(PROTOCOL_VERSION::equals).serverAcceptedVersions(PROTOCOL_VERSION::equals).networkProtocolVersion(() -> PROTOCOL_VERSION).simpleChannel();
 
-        channel.messageBuilder(SyncDirectionCap.class, nextID())
-        	.encoder(SyncDirectionCap::toBytes)
-        	.decoder(SyncDirectionCap::new)
-        	.consumer(SyncDirectionCap::handle)
-        	.add();
+        channel.messageBuilder(SyncDirectionCap.class, nextID()).encoder(SyncDirectionCap::toBytes).decoder(SyncDirectionCap::new).consumer(SyncDirectionCap::handle).add();
     }
 
     public static void sendToClient(Object msg, ServerPlayerEntity player) {
