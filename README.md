@@ -1,6 +1,9 @@
 # Gravity Project for Minecraft Forge 1.16.5
+> [!NOTE]
+> Branch 1.16.5-forge is licenced under the MIT [License](LICENSE).
 
-Branch 1.16.5-forge is licenced under the MIT [License](LICENSE).
+> [!IMPORTANT]
+> It's THE BETA of Gravity Mod. It has some problems with Camera
 
 This mod adds Gravity library to Minecraft 1.16.5 with Forge.
 
