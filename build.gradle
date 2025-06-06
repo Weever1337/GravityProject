@@ -133,8 +133,6 @@ githubRelease {
     prerelease false
 }
 
-println(System.getenv("GITHUB_ACTOR"))
-println(System.getenv("GITHUB_TOKEN"))
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -144,11 +142,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Weever1337/GravityProject")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+            url 'https://pkgs.dev.azure.com/weever1337/60e8f2cf-4d94-41e0-9b30-f900d6f1459d/_packaging/gravityproject/maven/v1'
+            name 'gravityproject'
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
             }
         }
     }
