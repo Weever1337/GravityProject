@@ -7,11 +7,11 @@ issueTrackerURL = "https://github.com/Weever1337/GravityProject/issues"
     modId = "${mod_id}"
     version = "${mod_version}"
     displayName = "${mod_name}"
-    displayURL = 'https://boosty.to/weever
+    displayURL = "https://boosty.to/weever"
     authors = "${mod_authors}"
     logoFile = "logo.png"
     credits = ""
-    description = 'This mod adds Gravity library to Minecraft 1.16.5 with Forge.'
+    description = "This mod adds Gravity library to Minecraft 1.16.5 with Forge."
 
 [[dependencies.${ mod_id }]]
     modId = "forge"
