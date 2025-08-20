@@ -15,14 +15,14 @@ This mod adds Gravity library to Minecraft 1.16.5 with Forge.
 ```groovy
 repositories {
     maven {
-        name = "Gravity Maven"
-        url = uri("https://pkgs.dev.azure.com/weever1337/60e8f2cf-4d94-41e0-9b30-f900d6f1459d/_packaging/gravityproject/maven/v1")
+        name = "Jitpack"
+        url = uri("https://jitpack.io")
     }
 }
 
 
 dependencies {
-    implementation('org.weever.gravitymod:gravityproject:0.1-beta')
+    implementation('org.weever.gravitymod:gravityproject:${VERSION}')
 }
 ```
 

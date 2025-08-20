@@ -120,34 +120,11 @@ mixin {
     config "mixins.gravitymod.json"
 }
 
-//githubRelease {
-//    token System.getenv("GITHUB_TOKEN")
-//    owner "Weever1337"
-//    repo "GravityProject"
-//    tagName "v${project.version}"
-//    releaseName "Latest 1.16.5 v${project.version}"
-//    targetCommitish "1.16.5-forge"
-//    generateReleaseNotes true
-//    releaseAssets = [jar.archivePath]
-//    draft false
-//    prerelease false
-//}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'gravityproject'
             artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url 'https://pkgs.dev.azure.com/weever1337/60e8f2cf-4d94-41e0-9b30-f900d6f1459d/_packaging/gravityproject/maven/v1'
-            name 'gravityproject'
-            credentials(PasswordCredentials)
-            authentication {
-                basic(BasicAuthentication)
-            }
         }
     }
 }
