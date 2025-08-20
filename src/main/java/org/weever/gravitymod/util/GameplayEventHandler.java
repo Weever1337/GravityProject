@@ -1,12 +1,7 @@
 package org.weever.gravitymod.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.weever.gravitymod.GravityMod;
-import org.weever.gravitymod.api.GravityAPI;
-import org.weever.gravitymod.api.GravityDirection;
 
 @Mod.EventBusSubscriber(modid = GravityMod.MODID)
 public class GameplayEventHandler {

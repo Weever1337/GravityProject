@@ -4,10 +4,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import org.weever.gravitymod.api.GravityAPI;
-import org.weever.gravitymod.api.GravityDirection;
+import org.weever.gravitymod.access.IGravityEntity;
+import org.weever.gravitymod.util.GravityAPI;
 
 public class GravityChanger extends Item {
     public String gravityDirection;
@@ -20,12 +21,12 @@ public class GravityChanger extends Item {
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         if (player.isAlive()) {
-            GravityDirection playerGravityDirection = GravityAPI.getGravityDirection(player);
-            GravityDirection gravityDirection = GravityDirection.valueOf(this.gravityDirection.toUpperCase());
-            if (playerGravityDirection != GravityDirection.DOWN && playerGravityDirection == gravityDirection) {
-                GravityAPI.setGravityDirection(player, GravityDirection.DOWN);
+            Direction playerGravityDirection = GravityAPI.getGravityDirection(player);
+            Direction gravityDirection = Direction.valueOf(this.gravityDirection.toUpperCase());
+            if (playerGravityDirection != Direction.DOWN && playerGravityDirection == gravityDirection) {
+                ((IGravityEntity) player).gravitymod$setGravityDirection(Direction.DOWN);
             } else {
-                GravityAPI.setGravityDirection(player, gravityDirection);
+                ((IGravityEntity) player).gravitymod$setGravityDirection(gravityDirection);
             }
         }
         return ActionResult.pass(this.getDefaultInstance());

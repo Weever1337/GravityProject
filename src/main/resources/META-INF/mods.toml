@@ -10,8 +10,8 @@ issueTrackerURL = "https://github.com/Weever1337/GravityProject/issues"
     displayURL = "https://boosty.to/weever"
     authors = "${mod_authors}"
     logoFile = "logo.png"
-    credits = ""
-    description = "This mod adds Gravity library to Minecraft 1.16.5 with Forge."
+    credits = "Hydra, quoteall"
+    description = "This mod adds Gravity library to Minecraft."
 
 [[dependencies.${ mod_id }]]
     modId = "forge"

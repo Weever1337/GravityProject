@@ -3,16 +3,16 @@ package org.weever.gravitymod.effects;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
+import net.minecraft.util.Direction;
 import net.minecraftforge.fml.common.Mod;
 import org.weever.gravitymod.GravityMod;
-import org.weever.gravitymod.api.GravityAPI;
-import org.weever.gravitymod.api.GravityDirection;
+import org.weever.gravitymod.access.IGravityEntity;
 
 @Mod.EventBusSubscriber(modid = GravityMod.MODID)
 public class GravityRotateEffect extends Effect {
-    private final GravityDirection direction;
+    private final Direction direction;
 
-    public GravityRotateEffect(EffectType type, int liquidColor, GravityDirection gravityDirection) {
+    public GravityRotateEffect(EffectType type, int liquidColor, Direction gravityDirection) {
         super(type, liquidColor);
         this.direction = gravityDirection;
     }
@@ -25,7 +25,7 @@ public class GravityRotateEffect extends Effect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (!entity.level.isClientSide()) {
-            GravityAPI.setGravityDirection(entity, direction);
+            ((IGravityEntity) entity).gravitymod$setGravityDirection(direction);
         }
     }
 }
