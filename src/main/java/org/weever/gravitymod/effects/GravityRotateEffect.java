@@ -17,6 +17,11 @@ public class GravityRotateEffect extends Effect {
         this.direction = gravityDirection;
     }
 
+    @Override
+    public boolean isDurationEffectTick(int duration, int amplifier) {
+        return true;
+    }
+
     //    @Override
     //    public boolean isInstantenous(){
     //    	return true;
