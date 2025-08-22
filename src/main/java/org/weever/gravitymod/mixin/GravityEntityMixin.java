@@ -1,14 +1,13 @@
 package org.weever.gravitymod.mixin;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.impl.data.EntityDataAccessor;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.EnderCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.network.datasync.DataParameter;
@@ -16,7 +15,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.Direction;
@@ -32,7 +30,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,11 +37,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.weever.gravitymod.GravityMod;
 import org.weever.gravitymod.access.IClientEntity;
 import org.weever.gravitymod.access.IGravityEntity;
 import org.weever.gravitymod.util.GravityAPI;
@@ -61,6 +57,8 @@ import java.util.stream.Stream;
 
 @Mixin(Entity.class)
 public abstract class GravityEntityMixin implements IGravityEntity {
+    @Shadow
+    public abstract int getId();
     @Shadow
     public static double getHorizontalDistanceSqr(Vector3d p_213296_0_) {
         return p_213296_0_.x * p_213296_0_.x + p_213296_0_.z * p_213296_0_.z;
@@ -447,6 +445,26 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 //        }
 //        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
 //    }
+
+    @Redirect(
+            method = "setPos",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntitySize;makeBoundingBox(DDD)Lnet/minecraft/util/math/AxisAlignedBB;"))
+    private AxisAlignedBB inject_calculateBoundingBox(EntitySize instance, double pX, double pY, double pZ) {
+        AxisAlignedBB originalBb = instance.makeBoundingBox(pX, pY, pZ);
+        if (this.getEntityData() != null){
+            Entity entity = ((Entity) (Object) this);
+            if (entity instanceof ProjectileEntity) return originalBb;
+            Direction gravityDirection = ((IGravityEntity)entity).gravitymod$getGravityDirection();
+            if (gravityDirection == Direction.DOWN) return originalBb;
+
+            AxisAlignedBB box = originalBb.move(this.position.reverse());
+            if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+                box = box.move(0.0D, -1.0E-6D, 0.0D);
+            }
+            return RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position);
+        }
+        return originalBb;
+    }
 
     @Inject(
             method = "calculateViewVector",
