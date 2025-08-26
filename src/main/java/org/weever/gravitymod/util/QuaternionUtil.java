@@ -3,6 +3,7 @@ package org.weever.gravitymod.util;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import org.weever.gravitymod.GravityMod;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.sqrt;
@@ -25,7 +26,11 @@ public abstract class QuaternionUtil {
         Vector3d axis = from.cross(to).normalize();
         double cos = from.dot(to);
         double angle = Math.acos(cos);
-
+        GravityMod.LOGGER.info(new Quaternion(
+                new Vector3f((float) axis.x, (float) axis.y, (float) axis.z),
+                (float) angle,
+                false
+        ).toString());
         return new Quaternion(
                 new Vector3f((float) axis.x, (float) axis.y, (float) axis.z),
                 (float) angle,

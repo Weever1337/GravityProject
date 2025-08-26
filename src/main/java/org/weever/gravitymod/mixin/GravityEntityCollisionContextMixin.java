@@ -48,11 +48,9 @@ public abstract class GravityEntityCollisionContextMixin {
     /**Shadows, ignore
      * -------------------------------------------------------------------------------------------------------------
      * */
-    @Shadow
-    @Final
+    @Shadow @Final
     private Entity entity;
 
-    @Shadow
-    @Final
+    @Shadow @Final
     private double entityBottom;
 }

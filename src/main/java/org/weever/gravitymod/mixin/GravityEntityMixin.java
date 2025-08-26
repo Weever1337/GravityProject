@@ -1,5 +1,6 @@
 package org.weever.gravitymod.mixin;
 
+import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -30,6 +31,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +56,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static net.minecraft.entity.Entity.collideBoundingBoxLegacy;
 
 @Mixin(Entity.class)
 public abstract class GravityEntityMixin implements IGravityEntity {
@@ -270,17 +274,22 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             );
         }
 
-        Vector3d realWorldVelocity = gravitymod$getRealWorldVelocity(((Entity)(Object)this), oldGravity);
-        if (rotationParameters.rotateVelocity()) {
-            // Rotate velocity with gravity, this will cause things to appear to take a sharp turn
-            Vector3f worldSpaceVec = new Vector3f((float) realWorldVelocity.x, (float) realWorldVelocity.y, (float) realWorldVelocity.z);
-            worldSpaceVec.transform(RotationUtil.getRotationBetween(oldGravity, newGravity)); // TODO: CAN BE A PROBLEM SO BE CAREFUL
-            setDeltaMovement(RotationUtil.vecWorldToPlayer(new Vector3d(worldSpaceVec), newGravity));
-        }
-        else {
-            // Velocity will be conserved relative to the world, will result in more natural motion
-            setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
-        }
+        Vector3d realWorldVelocity = getDeltaMovement();
+        GravityMod.LOGGER.info("rWV {}", realWorldVelocity);
+        GravityMod.LOGGER.info("rotated rWV {}", RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+        setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+//        if (rotationParameters.rotateVelocity()) {
+//            // Rotate velocity with gravity, this will cause things to appear to take a sharp turn
+//            Vector3f worldSpaceVec = new Vector3f((float) getDeltaMovement().x, (float) getDeltaMovement().y, (float) getDeltaMovement().z);
+////            worldSpaceVec.transform(RotationUtil.getRotationBetween(oldGravity, newGravity)); // TODO: CAN BE A PROBLEM SO BE CAREFUL
+//            GravityMod.LOGGER.info("1 {}", worldSpaceVec);
+//            setDeltaMovement(RotationUtil.vecWorldToPlayer(new Vector3d(worldSpaceVec), newGravity));
+//        }
+//        else {
+//            // Velocity will be conserved relative to the world, will result in more natural motion
+//            GravityMod.LOGGER.info("2 {}",  RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+//            setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+//        }
     }
 
     // Adjust position to avoid suffocation in blocks when changing gravity
@@ -375,13 +384,18 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     // The real velocity is this tick position subtract last tick position
     @Unique
     private static Vector3d gravitymod$getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
-        if (entity.isControlledByLocalInstance()) {
-            return new Vector3d(
-                    entity.getX() - entity.xo,
-                    entity.getY() - entity.yo,
-                    entity.getZ() - entity.zo
-            );
-        }
+//        if (entity.isControlledByLocalInstance()) {
+//            GravityMod.LOGGER.info("vel {}", new Vector3d(
+//                    entity.getX() - entity.xo,
+//                    entity.getY() - entity.yo,
+//                    entity.getZ() - entity.zo
+//            ));
+//            return new Vector3d(
+//                    entity.getX() - entity.xo,
+//                    entity.getY() - entity.yo,
+//                    entity.getZ() - entity.zo
+//            );
+//        }
 
         return RotationUtil.vecPlayerToWorld(entity.getDeltaMovement(), prevGravityDirection);
     }
@@ -423,28 +437,6 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
 
     // THE GENERAL MIXIN STUFF
-
-
-
-//    @SuppressWarnings("ConstantValue") // TODO: DO IT IN ENTITY SIZE MIXIN!!!!!!!!
-//    @Inject(
-//            method = "makeBoundingBox()",
-//            at = @At("RETURN"),
-//            cancellable = true
-//    )
-//    private void inject_calculateBoundingBox(CallbackInfoReturnable<AxisAlignedBB> cir) {
-//        Entity entity = ((Entity) (Object) this);
-//        if (entity instanceof Projectile) return;
-//
-//        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-//        if (gravityDirection == Direction.DOWN) return;
-//
-//        AxisAlignedBB box = cir.getReturnValue().move(this.position.reverse());
-//        if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
-//            box = box.move(0.0D, -1.0E-6D, 0.0D);
-//        }
-//        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
-//    }
 
     @Redirect(
             method = "setPos",
@@ -519,7 +511,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         cir.setReturnValue(new Vector3d(d, e, f));
     }
 
-//    @Inject( // todo: fix this shit
+//    @Inject( // this is not what should be fixed
 //            method = "getLightProbePosition",
 //            at = @At("HEAD"),
 //            cancellable = true
@@ -527,8 +519,8 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 //    private void inject_getBrightnessAtFEyes(CallbackInfoReturnable<Float> cir) {
 //        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
 //        if (gravityDirection == Direction.DOWN) return;
-//
-//        cir.setReturnValue(this.level.hasChunkAt(this.blockPosition) ? this.level.getLightLevelDependentMagicValue(BlockPos.containing(this.getEyePosition(1))) : 0.0F);
+//        BlockPos eyePos = new BlockPos(Math.floor(this.getEyePosition(1).x), Math.floor(this.getEyePosition(1).y), Math.floor(this.getEyePosition(1).z));
+//        cir.setReturnValue(this.level.hasChunkAt(this.blockPosition) ? this.level.getBrightness(eyePos) : 0.0F);
 //    }
 
     // transform move vector from local to world (the velocity is local)
@@ -697,79 +689,76 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         cir.setReturnValue(RotationUtil.vecWorldToPlayer($$3, gravityDirection));
     }
 
-//    @Inject( // todo: fix this
-//            method = "collideBoundingBox",
-//            at = @At("HEAD"),
-//            cancellable = true
-//    )
-//    private static void gravitymod$collideBoundingBox(Vector3d pVec, AxisAlignedBB pCollisionBox, IWorldReader pLevel, ISelectionContext pSelectionContext, ReuseableStream<VoxelShape> pPotentialHits, CallbackInfoReturnable<Vector3d> cir) {
-//        if (entity == null)
-//            return;
-//        Direction gravityDirection = GravityAPI.getGravityDirection(entity);
-//        if (gravityDirection == Direction.DOWN)
-//            return;
-//
-//        movement = RotationUtil.vecPlayerToWorld(movement, gravityDirection);
-//
-//        ImmutableList.Builder<VoxelShape> $$5 = ImmutableList.builderWithExpectedSize(collisions.size() + 1);
-//        if (!collisions.isEmpty()) {
-//            $$5.addAll(collisions);
-//        }
-//
-//        WorldBorder $$6 = $$3.getWorldBorder();
-//        boolean $$7 = entity != null && $$6.isInsideCloseToBorder(entity, entityBoundingBox.expandTowards(movement));
-//        if ($$7) {
-//            $$5.add($$6.getCollisionShape());
-//        }
-//
-//        $$5.addAll($$3.getBlockCollisions(entity, entityBoundingBox.expandTowards(movement)));
-//
-//        cir.setReturnValue(RotationUtil.vecWorldToPlayer(gravitymod$collideWithShapesGrav(movement, entityBoundingBox, $$5.build(),entity), gravityDirection));
-//    }
-//
-//
-//    @Unique
-//    private static Vector3d gravitymod$collideWithShapesGrav(Vector3d movement, AxisAlignedBB entityBoundingBox, Stream<VoxelShape> collisions, Entity entity) {
-//        Direction gravityDirection;
-//        if (entity == null || (gravityDirection = GravityAPI.getGravityDirection(entity)) == Direction.DOWN) {
-//            return collideWithShapes(movement, entityBoundingBox, collisions);
-//        }
-//
-//        Vector3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
-//        double playerMovementX = playerMovement.x;
-//        double playerMovementY = playerMovement.y;
-//        double playerMovementZ = playerMovement.z;
-//        Direction directionX = RotationUtil.dirPlayerToWorld(Direction.EAST, gravityDirection);
-//        Direction directionY = RotationUtil.dirPlayerToWorld(Direction.UP, gravityDirection);
-//        Direction directionZ = RotationUtil.dirPlayerToWorld(Direction.SOUTH, gravityDirection);
-//        if (playerMovementY != 0.0D) {
-//            playerMovementY = VoxelShapes.collide(directionY.getAxis(), entityBoundingBox, collisions, playerMovementY * directionY.getAxisDirection().getStep()) * directionY.getAxisDirection().getStep();
-//            if (playerMovementY != 0.0D) {
-//                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
-//            }
-//        }
-//
-//        boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
-//        if (isZLargerThanX && playerMovementZ != 0.0D) {
-//            playerMovementZ = VoxelShapes.collide(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getAxisDirection().getStep()) * directionZ.getAxisDirection().getStep();
-//            if (playerMovementZ != 0.0D) {
-//                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
-//            }
-//        }
-//
-//        if (playerMovementX != 0.0D) {
-//            playerMovementX = VoxelShapes.collide(directionX.getAxis(), entityBoundingBox, collisions, playerMovementX * directionX.getAxisDirection().getStep()) * directionX.getAxisDirection().getStep();
-//            if (!isZLargerThanX && playerMovementX != 0.0D) {
-//                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
-//            }
-//        }
-//
-//        if (!isZLargerThanX && playerMovementZ != 0.0D) {
-//            playerMovementZ = VoxelShapes.collide(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getAxisDirection().getStep()) * directionZ.getAxisDirection().getStep();
-//        }
-//
-//        return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
-//    }
+
+    @Inject( // todo: fix this
+            method = "collideBoundingBoxHeuristically",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private static void gravitymod$collideBoundingBox(Entity pEntity, Vector3d pVec, AxisAlignedBB pCollisionBox, World pLevel, ISelectionContext pContext, ReuseableStream<VoxelShape> pPotentialHits, CallbackInfoReturnable<Vector3d> cir) {
+        if (pEntity == null)
+            return;
+        Direction gravityDirection = GravityAPI.getGravityDirection(pEntity);
+        if (gravityDirection == Direction.DOWN)
+            return;
+
+        pVec = RotationUtil.vecPlayerToWorld(pVec, gravityDirection);
+
+        List<VoxelShape> $$5 = pPotentialHits.getStream().collect(Collectors.toList());
+
+        WorldBorder $$6 = pLevel.getWorldBorder();
+        boolean $$7 = pEntity != null && $$6.isWithinBounds(pCollisionBox.expandTowards(pVec));
+        if ($$7) {
+            $$5.add($$6.getCollisionShape());
+        }
+
+        $$5.addAll(pLevel.getBlockCollisions(pEntity, pCollisionBox.expandTowards(pVec)).collect(Collectors.toList()));
+
+        cir.setReturnValue(RotationUtil.vecWorldToPlayer(gravitymod$collideWithShapesGrav(pVec, pCollisionBox, new ReuseableStream<>($$5.stream()) ,pEntity), gravityDirection));
+    }
+
+    @Unique
+    private static Vector3d gravitymod$collideWithShapesGrav(Vector3d movement, AxisAlignedBB entityBoundingBox, ReuseableStream<VoxelShape> collisions, Entity entity) {
+        Direction gravityDirection;
+        if (entity == null || (gravityDirection = GravityAPI.getGravityDirection(entity)) == Direction.DOWN) {
+            return collideBoundingBoxLegacy(movement, entityBoundingBox, collisions);
+        }
+
+        Vector3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
+        double playerMovementX = playerMovement.x;
+        double playerMovementY = playerMovement.y;
+        double playerMovementZ = playerMovement.z;
+        Direction directionX = RotationUtil.dirPlayerToWorld(Direction.EAST, gravityDirection);
+        Direction directionY = RotationUtil.dirPlayerToWorld(Direction.UP, gravityDirection);
+        Direction directionZ = RotationUtil.dirPlayerToWorld(Direction.SOUTH, gravityDirection);
+        if (playerMovementY != 0.0D) {
+            playerMovementY = VoxelShapes.collide(directionY.getAxis(), entityBoundingBox, collisions.getStream(), playerMovementY * directionY.getAxisDirection().getStep()) * directionY.getAxisDirection().getStep();
+            if (playerMovementY != 0.0D) {
+                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
+            }
+        }
+
+        boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
+        if (isZLargerThanX && playerMovementZ != 0.0D) {
+            playerMovementZ = VoxelShapes.collide(directionZ.getAxis(), entityBoundingBox, collisions.getStream(), playerMovementZ * directionZ.getAxisDirection().getStep()) * directionZ.getAxisDirection().getStep();
+            if (playerMovementZ != 0.0D) {
+                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
+            }
+        }
+
+        if (playerMovementX != 0.0D) {
+            playerMovementX = VoxelShapes.collide(directionX.getAxis(), entityBoundingBox, collisions.getStream(), playerMovementX * directionX.getAxisDirection().getStep()) * directionX.getAxisDirection().getStep();
+            if (!isZLargerThanX && playerMovementX != 0.0D) {
+                entityBoundingBox = entityBoundingBox.move(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
+            }
+        }
+
+        if (!isZLargerThanX && playerMovementZ != 0.0D) {
+            playerMovementZ = VoxelShapes.collide(directionZ.getAxis(), entityBoundingBox, collisions.getStream(), playerMovementZ * directionZ.getAxisDirection().getStep()) * directionZ.getAxisDirection().getStep();
+        }
+
+        return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
+    }
 
     @Inject(
             method = "isInWall",
