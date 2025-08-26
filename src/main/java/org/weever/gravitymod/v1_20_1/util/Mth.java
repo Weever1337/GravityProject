@@ -16,4 +16,8 @@ public class Mth {
     public static double length(double $$0, double $$1, double $$2) {
         return Math.sqrt(lengthSquared($$0, $$1, $$2));
     }
+
+    public static double clamp(double p_14009_, double p_14010_, double p_14011_) {
+        return p_14009_ < p_14010_ ? p_14010_ : Math.min(p_14009_, p_14011_);
+    }
 }

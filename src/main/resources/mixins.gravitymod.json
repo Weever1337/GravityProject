@@ -16,6 +16,7 @@
     "GravityLivingEntityMixin",
     "GravityMobMixin",
     "GravityPlayerMixin",
+    "GravityServerPlayNetHandlerImplMixin",
     "GravityUseOnContextMixin",
     "fall_distance.GravityServerPlayerFall"
   ],

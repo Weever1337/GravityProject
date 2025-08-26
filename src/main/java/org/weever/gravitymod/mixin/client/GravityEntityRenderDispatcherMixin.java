@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -165,22 +166,22 @@ public abstract class GravityEntityRenderDispatcherMixin {
             }
         }
     }
-    
-//    @ModifyVariable(
-//            method = "renderHitbox",
-//            at = @At(
-//                    value = "STORE"
-//            ),
-//            ordinal = 0
-//    )
-//    private static AxisAlignedBB gravitymod$renderHitboxAAB(Vector3d viewVector, MatrixStack matrices, IVertexBuilder vertices, Entity entity, float tickDelta) {
-//        Direction gravityDirection = GravityAPI.getGravityDirection(entity);
-//        if (gravityDirection == Direction.DOWN) {
-//            return box;
-//        }
-//
-//        return RotationUtil.boxWorldToPlayer(box, gravityDirection);
-//    }
+
+    @ModifyVariable(
+            method = "renderBox",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLineBox(Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;Lnet/minecraft/util/math/AxisAlignedBB;FFFF)V"
+            ),
+            ordinal = 0)
+    private AxisAlignedBB gravitymod$renderHitboxAAB(AxisAlignedBB box, MatrixStack p_229094_1_, IVertexBuilder p_229094_2_, Entity entity, float p_229094_4_, float p_229094_5_, float p_229094_6_) {
+        Direction gravityDirection = GravityAPI.getGravityDirection(entity);
+        if (gravityDirection == Direction.DOWN) {
+            return box;
+        }
+
+        return RotationUtil.boxWorldToPlayer(box, gravityDirection);
+    }
 
     @ModifyVariable(
             method = "renderHitbox",

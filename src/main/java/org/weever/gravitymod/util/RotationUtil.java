@@ -7,6 +7,7 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import org.weever.gravitymod.GravityMod;
 
 //https://github.com/qouteall/GravityChanger/tree/1.20.1-Fabric/src/main/java/gravity_changer/util
 //credit to quoteall
@@ -55,13 +56,14 @@ public abstract class RotationUtil {
             case UP:
                 return new Vector3d(-x, -y, z);
             case NORTH:
-                return new Vector3d(x, z, -y);
-            case SOUTH:
-                return new Vector3d(-x, -z, -y);
-            case WEST:
                 return new Vector3d(-z, x, -y);
-            case EAST:
+            case SOUTH:
                 return new Vector3d(z, -x, -y);
+            case WEST:
+                return new Vector3d(x, z, -y);
+            case EAST:
+                return new Vector3d(-x, -z, -y);
+
             default:
                 throw new IllegalStateException("Unexpected value: " + gravityDirection);
         }
@@ -285,6 +287,7 @@ public abstract class RotationUtil {
         Vector3d start = Vector3d.atLowerCornerOf(d1.getNormal());
         Vector3d end = Vector3d.atLowerCornerOf(d2.getNormal());
         if (d1.getOpposite() == d2) {
+            GravityMod.LOGGER.info(new Quaternion(new Vector3f(0, 0, -1), 180.0f, true).toString());
             return new Quaternion(new Vector3f(0, 0, -1), 180.0f, true);
         } else {
             return QuaternionUtil.getRotationBetween(start, end);
