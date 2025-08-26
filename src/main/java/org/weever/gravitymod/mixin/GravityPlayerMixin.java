@@ -9,7 +9,7 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
@@ -137,14 +137,14 @@ public abstract class GravityPlayerMixin extends LivingEntity {
                 float $$5 = this.random.nextFloat() * 0.5F;
                 float $$6 = this.random.nextFloat() * (float) (Math.PI * 2);
 
-                Vector3d world = RotationUtil.vecPlayerToWorld((double)(-MathHelper.sin($$6) * $$5), 0.2F, (double)(MathHelper.cos($$6) * $$5), gravityDirection);
+                Vector3d world = RotationUtil.vecPlayerToWorld((double)(-Mth.sin($$6) * $$5), 0.2F, (double)(Mth.cos($$6) * $$5), gravityDirection);
                 GravityAPI.setWorldVelocity($$4, world);
             } else {
                 float $$7 = 0.3F;
-                float $$8 = MathHelper.sin(this.xRot * (float) (Math.PI / 180.0));
-                float $$9 = MathHelper.cos(this.xRot * (float) (Math.PI / 180.0));
-                float $$10 = MathHelper.sin(this.yRot * (float) (Math.PI / 180.0));
-                float $$11 = MathHelper.cos(this.yRot * (float) (Math.PI / 180.0));
+                float $$8 = Mth.sin(this.xRot * (float) (Math.PI / 180.0));
+                float $$9 = Mth.cos(this.xRot * (float) (Math.PI / 180.0));
+                float $$10 = Mth.sin(this.yRot * (float) (Math.PI / 180.0));
+                float $$11 = Mth.cos(this.yRot * (float) (Math.PI / 180.0));
                 float $$12 = this.random.nextFloat() * (float) (Math.PI * 2);
                 float $$13 = 0.02F * this.random.nextFloat();
                 Vector3d world = RotationUtil.vecPlayerToWorld((double)(-$$10 * $$9 * 0.3F) + Math.cos((double)$$12) * (double)$$13,

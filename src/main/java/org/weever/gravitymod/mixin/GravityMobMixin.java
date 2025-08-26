@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,8 +61,8 @@ public abstract class GravityMobMixin extends LivingEntity {
         }
 
         double $$8 = Math.sqrt($$3 * $$3 + $$4 * $$4);
-        float $$9 = (float)(MathHelper.atan2($$4, $$3) * 180.0F / (float)Math.PI) - 90.0F;
-        float $$10 = (float)(-(MathHelper.atan2($$6, $$8) * 180.0F / (float)Math.PI));
+        float $$9 = (float)(Mth.atan2($$4, $$3) * 180.0F / (float)Math.PI) - 90.0F;
+        float $$10 = (float)(-(Mth.atan2($$6, $$8) * 180.0F / (float)Math.PI));
         this.xRot = (this.rotlerp(this.xRot, $$10, $$2));
         this.yRot = (this.rotlerp(this.yRot, $$9, $$1));
     }

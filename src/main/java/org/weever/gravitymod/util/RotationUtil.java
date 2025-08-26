@@ -2,12 +2,13 @@ package org.weever.gravitymod.util;
 
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import org.weever.gravitymod.GravityMod;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 
 //https://github.com/qouteall/GravityChanger/tree/1.20.1-Fabric/src/main/java/gravity_changer/util
 //credit to quoteall
@@ -56,13 +57,13 @@ public abstract class RotationUtil {
             case UP:
                 return new Vector3d(-x, -y, z);
             case NORTH:
-                return new Vector3d(-z, x, -y);
-            case SOUTH:
-                return new Vector3d(z, -x, -y);
-            case WEST:
                 return new Vector3d(x, z, -y);
-            case EAST:
+            case SOUTH:
                 return new Vector3d(-x, -z, -y);
+            case WEST:
+                return new Vector3d(-z, x, -y);
+            case EAST:
+                return new Vector3d(z, -x, -y);
 
             default:
                 throw new IllegalStateException("Unexpected value: " + gravityDirection);
@@ -229,11 +230,11 @@ public abstract class RotationUtil {
         double radPitch = Math.asin(sinPitch);
         double cosPitch = Math.cos(radPitch);
         double sinNegYaw = x / cosPitch;
-        double cosNegYaw = MathHelper.clamp(z / cosPitch, -1, 1);
+        double cosNegYaw = Mth.clamp(z / cosPitch, -1, 1);
         double radNegYaw = Math.acos(cosNegYaw);
         if (sinNegYaw < 0) radNegYaw = Math.PI * 2 - radNegYaw;
 
-        return new Vector2f(MathHelper.wrapDegrees((float) (-radNegYaw) / 0.017453292F), (float) (radPitch) / 0.017453292F);
+        return new Vector2f(Mth.wrapDegrees((float) (-radNegYaw) / 0.017453292F), (float) (radPitch) / 0.017453292F);
     }
 
     public static Vector2f vecToRot(Vector3d Vector3dd) {
@@ -307,10 +308,10 @@ public abstract class RotationUtil {
 
         if (dot > 0.9995f) {
             Quaternion result = new Quaternion(
-                    MathHelper.lerp(t, q1.i(), q2c.i()),
-                    MathHelper.lerp(t, q1.j(), q2c.j()),
-                    MathHelper.lerp(t, q1.k(), q2c.k()),
-                    MathHelper.lerp(t, q1.r(), q2c.r())
+                    Mth.lerp(t, q1.i(), q2c.i()),
+                    Mth.lerp(t, q1.j(), q2c.j()),
+                    Mth.lerp(t, q1.k(), q2c.k()),
+                    Mth.lerp(t, q1.r(), q2c.r())
             );
             result.normalize();
             return result;

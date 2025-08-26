@@ -5,7 +5,8 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import org.joml.Quaternionf;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
@@ -89,11 +90,11 @@ public abstract class GravityCameraMixin {
 
             Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
 
-            double entityX = MathHelper.lerp((double) tickDelta, focusedEntity.xo, focusedEntity.getX());
-            double entityY = MathHelper.lerp((double) tickDelta, focusedEntity.yo, focusedEntity.getY());
-            double entityZ = MathHelper.lerp((double) tickDelta, focusedEntity.zo, focusedEntity.getZ());
+            double entityX = Mth.lerp(tickDelta, focusedEntity.xo, focusedEntity.getX());
+            double entityY = Mth.lerp(tickDelta, focusedEntity.yo, focusedEntity.getY());
+            double entityZ = Mth.lerp(tickDelta, focusedEntity.zo, focusedEntity.getZ());
 
-            double currentCameraY = MathHelper.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight);
+            double currentCameraY = Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight);
 
             Vector3d eyeOffset = animation.getEyeOffset(
                     gravityRotation,
@@ -140,8 +141,13 @@ public abstract class GravityCameraMixin {
                 return;
             }
 
-            float partialTick = Minecraft.getInstance().getDeltaFrameTime();
+            float partialTick = Minecraft.getInstance().getFrameTime();
             long timeMs = entity.level.getGameTime() * 50 + (long) (partialTick * 50);
+
+//            Quaternion rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
+//            rotation.conj();
+//            rotation.mul(this.rotation);
+//            this.rotation.set(rotation.i(), rotation.j(), rotation.k(), rotation.r());
 
             Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).copy();
             Quaternion result = new Quaternion(this.rotation);

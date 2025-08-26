@@ -21,7 +21,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ReuseableStream;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -504,9 +504,9 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
         Vector3d Vector3dd = RotationUtil.vecPlayerToWorld(0.0D, this.eyeHeight, 0.0D, gravityDirection);
 
-        double d = MathHelper.lerp(tickDelta, this.xo, this.getX()) + Vector3dd.x;
-        double e = MathHelper.lerp(tickDelta, this.yo, this.getY()) + Vector3dd.y;
-        double f = MathHelper.lerp(tickDelta, this.zo, this.getZ()) + Vector3dd.z;
+        double d = Mth.lerp(tickDelta, this.xo, this.getX()) + Vector3dd.x;
+        double e = Mth.lerp(tickDelta, this.yo, this.getY()) + Vector3dd.y;
+        double f = Mth.lerp(tickDelta, this.zo, this.getZ()) + Vector3dd.z;
         cir.setReturnValue(new Vector3d(d, e, f));
     }
 
@@ -859,23 +859,23 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         if (gravityDirection == Direction.DOWN) return;
 
         AxisAlignedBB axisalignedbb = this.getBoundingBox().deflate(0.001D);
-        int i = MathHelper.floor(axisalignedbb.minX);
-        int j = MathHelper.ceil(axisalignedbb.maxX);
-        int k = MathHelper.floor(axisalignedbb.minY);
-        int l = MathHelper.ceil(axisalignedbb.maxY);
-        int i1 = MathHelper.floor(axisalignedbb.minZ);
-        int j1 = MathHelper.ceil(axisalignedbb.maxZ);
+        int i = Mth.floor(axisalignedbb.minX);
+        int j = Mth.ceil(axisalignedbb.maxX);
+        int k = Mth.floor(axisalignedbb.minY);
+        int l = Mth.ceil(axisalignedbb.maxY);
+        int i1 = Mth.floor(axisalignedbb.minZ);
+        int j1 = Mth.ceil(axisalignedbb.maxZ);
         
         if (!this.level.hasChunksAt(i, k, i1, j, l, j1)) {
             cir.setReturnValue(false);
         } else {
             AxisAlignedBB $$2 = this.getBoundingBox().deflate(0.001);
-            int $$3 = MathHelper.floor($$2.minX);
-            int $$4 = MathHelper.ceil($$2.maxX);
-            int $$5 = MathHelper.floor($$2.minY);
-            int $$6 = MathHelper.ceil($$2.maxY);
-            int $$7 = MathHelper.floor($$2.minZ);
-            int $$8 = MathHelper.ceil($$2.maxZ);
+            int $$3 = Mth.floor($$2.minX);
+            int $$4 = Mth.ceil($$2.maxX);
+            int $$5 = Mth.floor($$2.minY);
+            int $$6 = Mth.ceil($$2.maxY);
+            int $$7 = Mth.floor($$2.minZ);
+            int $$8 = Mth.ceil($$2.maxZ);
             double $$9 = 0.0;
             boolean $$10 = this.isPushedByFluid();
             boolean $$11 = false;
@@ -957,7 +957,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
                     Vector3d playerEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, gravityDirection);
                     double dx = playerEntityOffset.x;
                     double dz = playerEntityOffset.z;
-                    double f = MathHelper.absMax(dx, dz);
+                    double f = Mth.absMax(dx, dz);
                     if (f >= 0.009999999776482582D) {
                         f = Math.sqrt(f);
                         dx /= f;
@@ -981,7 +981,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
                     Vector3d entityEntityOffset = RotationUtil.vecWorldToPlayer(entityOffset, otherGravityDirection);
                     double dx = entityEntityOffset.x;
                     double dz = entityEntityOffset.z;
-                    double f = MathHelper.absMax(dx, dz);
+                    double f = Mth.absMax(dx, dz);
                     if (f >= 0.009999999776482582D) {
                         f = Math.sqrt(f);
                         dx /= f;

@@ -13,7 +13,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
@@ -113,9 +113,9 @@ public abstract class GravityEntityRenderDispatcherMixin {
 
         ci.cancel();
 
-        double x = MathHelper.lerp(tickDelta, entity.xOld, entity.getX());
-        double y = MathHelper.lerp(tickDelta, entity.yOld, entity.getY());
-        double z = MathHelper.lerp(tickDelta, entity.zOld, entity.getZ());
+        double x = Mth.lerp(tickDelta, entity.xOld, entity.getX());
+        double y = Mth.lerp(tickDelta, entity.yOld, entity.getY());
+        double z = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
         Vector3d minShadowPos = RotationUtil.vecPlayerToWorld(-radius, -radius, (double) -radius, gravityDirection).add(x, y, z);
         Vector3d maxShadowPos = RotationUtil.vecPlayerToWorld(radius, 0.0D, radius, gravityDirection).add(x, y, z);
         MatrixStack.Entry entry = matrices.last();

@@ -2,7 +2,7 @@ package org.weever.gravitymod.mixin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Vector2f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,10 +26,10 @@ public abstract class GravityDirectionMixin {
 
         float f = newPitch * ((float)Math.PI / 180F);
         float f1 = -newYaw * ((float)Math.PI / 180F);
-        float f2 = MathHelper.sin(f);
-        float f3 = MathHelper.cos(f);
-        float f4 = MathHelper.sin(f1);
-        float f5 = MathHelper.cos(f1);
+        float f2 = Mth.sin(f);
+        float f3 = Mth.cos(f);
+        float f4 = Mth.sin(f1);
+        float f5 = Mth.cos(f1);
         boolean flag = f4 > 0.0F;
         boolean flag1 = f2 < 0.0F;
         boolean flag2 = f5 > 0.0F;

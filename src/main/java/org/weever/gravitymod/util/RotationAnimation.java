@@ -1,7 +1,7 @@
 package org.weever.gravitymod.util;
 
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Quaternion;
@@ -158,7 +158,7 @@ public class RotationAnimation {
     }
 
     private static float mapProgress(float delta) {
-        return MathHelper.clamp((delta * delta * (3 - 2 * delta)), 0, 1);
+        return Mth.clamp((delta * delta * (3 - 2 * delta)), 0, 1);
     }
 
     public boolean isInAnimation() {

@@ -270,7 +270,7 @@ public abstract class GravityLivingEntityMixin extends Entity implements IGravit
                 }
 
                 if ($$15 < 0.0F && $$16 > 0.0) {
-                    double $$21 = $$17 * (double) (-MathHelper.sin($$15)) * 0.04;
+                    double $$21 = $$17 * (double) (-Mth.sin($$15)) * 0.04;
                     $$13 = $$13.add(-$$14.x * $$21 / $$16, $$21 * 3.2, -$$14.z * $$21 / $$16);
                 }
 
