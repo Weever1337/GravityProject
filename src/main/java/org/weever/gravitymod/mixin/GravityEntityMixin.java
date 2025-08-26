@@ -30,6 +30,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -435,26 +436,6 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
 
     // THE GENERAL MIXIN STUFF
-
-    @Redirect(
-            method = "setPos",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntitySize;makeBoundingBox(DDD)Lnet/minecraft/util/math/AxisAlignedBB;"))
-    private AxisAlignedBB inject_calculateBoundingBox(EntitySize instance, double pX, double pY, double pZ) {
-        AxisAlignedBB originalBb = instance.makeBoundingBox(pX, pY, pZ);
-        if (this.getEntityData() != null){
-            Entity entity = ((Entity) (Object) this);
-            if (entity instanceof ProjectileEntity) return originalBb;
-            Direction gravityDirection = ((IGravityEntity)entity).gravitymod$getGravityDirection();
-            if (gravityDirection == Direction.DOWN) return originalBb;
-
-            AxisAlignedBB box = originalBb.move(this.position.reverse());
-            if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
-                box = box.move(0.0D, -1.0E-6D, 0.0D);
-            }
-            return RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position);
-        }
-        return originalBb;
-    }
 
     @Redirect(
             method = "setPos",

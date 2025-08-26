@@ -23,8 +23,6 @@ import org.weever.gravitymod.v1_20_1.util.Mth;
 
 @Mixin(ServerPlayNetHandler.class)
 public abstract class GravityServerPlayNetHandlerImplMixin {
-    @Shadow public abstract void teleport(double d, double e, double f, float g, float h);
-
 
     @Unique
     public ServerPlayNetHandler gravitymod$this(){
