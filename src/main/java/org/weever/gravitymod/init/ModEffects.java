@@ -17,4 +17,6 @@ public class ModEffects {
     public static final RegistryObject<Effect> ROTATE_UP = EFFECTS.register("rotate_up", () -> new GravityRotateEffect(EffectType.HARMFUL, 0x404040, Direction.UP));
     public static final RegistryObject<Effect> ROTATE_EAST = EFFECTS.register("rotate_east", () -> new GravityRotateEffect(EffectType.HARMFUL, 0x404040, Direction.EAST));
     public static final RegistryObject<Effect> ROTATE_WEST = EFFECTS.register("rotate_west", () -> new GravityRotateEffect(EffectType.HARMFUL, 0x404040, Direction.WEST));
+    public static final RegistryObject<Effect> ROTATE_NORTH = EFFECTS.register("rotate_north", () -> new GravityRotateEffect(EffectType.HARMFUL, 0x404040, Direction.NORTH));
+    public static final RegistryObject<Effect> ROTATE_SOUTH = EFFECTS.register("rotate_south", () -> new GravityRotateEffect(EffectType.HARMFUL, 0x404040, Direction.SOUTH));
 }
