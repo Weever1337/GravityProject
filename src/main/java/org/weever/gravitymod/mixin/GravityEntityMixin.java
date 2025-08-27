@@ -120,6 +120,15 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         this.getEntityData().set(gravitymod$GRAVITY_DIRECTION, direction);
     }
 
+    @Unique
+    @Override
+    public void gravitymod$setBaseGravityDirection(Direction gravityDirection) {
+        if (gravitymod$baseGravityDirection != gravityDirection) {
+            gravitymod$baseGravityDirection = gravityDirection;
+            gravitymod$updateGravityStatus(); // will this cause issue?
+        }
+    }
+
     @Inject(method = "<init>", at = @At("TAIL"))
     public void gravitymod$init(EntityType $$0, World $$1, CallbackInfo ci){
         ((Entity) (Object) this).getEntityData().define(gravitymod$GRAVITY_DIRECTION, Direction.DOWN);
