@@ -283,21 +283,21 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         }
 
         Vector3d realWorldVelocity = getDeltaMovement();
-        GravityMod.LOGGER.info("rWV {}", realWorldVelocity);
-        GravityMod.LOGGER.info("rotated rWV {}", RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
-        setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
-//        if (rotationParameters.rotateVelocity()) {
-//            // Rotate velocity with gravity, this will cause things to appear to take a sharp turn
-//            Vector3f worldSpaceVec = new Vector3f((float) getDeltaMovement().x, (float) getDeltaMovement().y, (float) getDeltaMovement().z);
-////            worldSpaceVec.transform(RotationUtil.getRotationBetween(oldGravity, newGravity)); // TODO: CAN BE A PROBLEM SO BE CAREFUL
-//            GravityMod.LOGGER.info("1 {}", worldSpaceVec);
+//        GravityMod.LOGGER.info("rWV {}", realWorldVelocity);
+//        GravityMod.LOGGER.info("rotated rWV {}", RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+//        setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+        if (rotationParameters.rotateVelocity()) {
+            // Rotate velocity with gravity, this will cause things to appear to take a sharp turn
+            Vector3f worldSpaceVec = new Vector3f((float) getDeltaMovement().x, (float) getDeltaMovement().y, (float) getDeltaMovement().z);
+            worldSpaceVec.transform(RotationUtil.getRotationBetween(oldGravity, newGravity)); // TODO: CAN BE A PROBLEM SO BE CAREFUL
+            GravityMod.LOGGER.info("1 {}", worldSpaceVec);
 //            setDeltaMovement(RotationUtil.vecWorldToPlayer(new Vector3d(worldSpaceVec), newGravity));
-//        }
-//        else {
-//            // Velocity will be conserved relative to the world, will result in more natural motion
+        }
+        else {
+            // Velocity will be conserved relative to the world, will result in more natural motion
 //            GravityMod.LOGGER.info("2 {}",  RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
-//            setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
-//        }
+            setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, newGravity));
+        }
     }
 
     // Adjust position to avoid suffocation in blocks when changing gravity
@@ -392,18 +392,18 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     // The real velocity is this tick position subtract last tick position
     @Unique
     private static Vector3d gravitymod$getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
-//        if (entity.isControlledByLocalInstance()) {
-//            GravityMod.LOGGER.info("vel {}", new Vector3d(
-//                    entity.getX() - entity.xo,
-//                    entity.getY() - entity.yo,
-//                    entity.getZ() - entity.zo
-//            ));
-//            return new Vector3d(
-//                    entity.getX() - entity.xo,
-//                    entity.getY() - entity.yo,
-//                    entity.getZ() - entity.zo
-//            );
-//        }
+        if (entity.isControlledByLocalInstance()) {
+            GravityMod.LOGGER.info("vel {}", new Vector3d(
+                    entity.getX() - entity.xo,
+                    entity.getY() - entity.yo,
+                    entity.getZ() - entity.zo
+            ));
+            return new Vector3d(
+                    entity.getX() - entity.xo,
+                    entity.getY() - entity.yo,
+                    entity.getZ() - entity.zo
+            );
+        }
 
         return RotationUtil.vecPlayerToWorld(entity.getDeltaMovement(), prevGravityDirection);
     }
@@ -446,6 +446,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
     // THE GENERAL MIXIN STUFF
 
+    ///  TODO: починить "прыжки" отталкивающие от блоков
     @Redirect(
             method = "setPos",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntitySize;makeBoundingBox(DDD)Lnet/minecraft/util/math/AxisAlignedBB;"))
@@ -487,7 +488,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) return;
 
-        cir.setReturnValue(BlockPosUtil.containing(this.position.add(Vector3d.atLowerCornerOf(gravityDirection.getNormal()).scale(0.5000001D))));
+        cir.setReturnValue(BlockPosUtil.containing(this.position.add(Vector3d.atCenterOf(gravityDirection.getNormal()))));
     }
 
     @Inject(
@@ -507,7 +508,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void inject_getCameraPosVec(float tickDelta, CallbackInfoReturnable<Vector3d> cir) {
+    private void inject_getCamovemeraPosVec(float tickDelta, CallbackInfoReturnable<Vector3d> cir) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) return;
 
@@ -572,23 +573,23 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     }
 
     // transform the local variable (result from collide()) to local coordinate
-//    @ModifyVariable(
-//            method = "move",
-//            at = @At(
-//                    value = "INVOKE",
-//                    target = "Lnet/minecraft/profiler/IProfiler;pop()V",
-//                    ordinal = 0
-//            ),
-//            ordinal = 1
-//    )
-//    private Vector3d modify_move_Vector3dd_1(Vector3d Vector3dd) {
-//        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-//        if (gravityDirection == Direction.DOWN) {
-//            return Vector3dd;
-//        }
-//
-//        return RotationUtil.vecWorldToPlayer(Vector3dd, gravityDirection);
-//    }
+    @ModifyVariable(
+            method = "move",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/profiler/IProfiler;pop()V",
+                    ordinal = 0
+            ),
+            ordinal = 1
+    )
+    private Vector3d modify_move_Vector3dd_1(Vector3d Vector3dd) {
+        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
+        if (gravityDirection == Direction.DOWN) {
+            return Vector3dd;
+        }
+
+        return RotationUtil.vecWorldToPlayer(Vector3dd, gravityDirection);
+    }
 
     @Inject(
             method = "move",
@@ -649,52 +650,13 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     // but bounding box move needs world coord
     @Inject(
             method = "collide",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
     private void gravitymod$collide(Vector3d $$0, CallbackInfoReturnable<Vector3d> cir) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN)
-            return;
-
-        AxisAlignedBB $$1 = this.getBoundingBox();
-        ISelectionContext $$1_context = ISelectionContext.of((Entity) (Object) this);
-        $$0 = RotationUtil.vecWorldToPlayer($$0, gravityDirection);
-        Stream<VoxelShape> $$2_stream = this.level.getEntityCollisions((Entity) (Object) this, $$1.expandTowards($$0), entity -> true);
-        ReuseableStream<VoxelShape> $$2 = new ReuseableStream<>($$2_stream);
-
-        Vector3d $$3 = $$0.lengthSqr() == 0.0 ? $$0 : collideBoundingBox($$0, $$1, this.level, $$1_context, $$2);
-        boolean $$4 = $$0.x != $$3.x;
-        boolean $$5 = $$0.y != $$3.y;
-        boolean $$6 = $$0.z != $$3.z;
-        boolean $$7 = this.onGround || $$5 && $$0.y < 0.0;
-        if (this.maxUpStep > 0.0F && $$7 && ($$4 || $$6)) {
-            Vector3d $$8 = collideBoundingBox(new Vector3d($$0.x, (double) this.maxUpStep, $$0.z), $$1, this.level, $$1_context, $$2);
-            Vector3d rotate = new Vector3d($$0.x, 0.0, $$0.z);
-            rotate = RotationUtil.vecPlayerToWorld(rotate, GravityAPI.getGravityDirection((Entity) (Object) this));
-
-            Vector3d $$9 = collideBoundingBox(new Vector3d(0.0, (double) this.maxUpStep, 0.0), $$1.expandTowards(rotate.x, rotate.y, rotate.z), this.level, $$1_context, $$2);
-            if ($$9.y < (double) this.maxUpStep) {
-
-                Vector3d rotatenew = $$9;
-                rotatenew = RotationUtil.vecPlayerToWorld(rotatenew, GravityAPI.getGravityDirection((Entity) (Object) this));
-
-                Vector3d $$10 = collideBoundingBox(new Vector3d($$0.x, 0.0, $$0.z), $$1.move(rotatenew), this.level, $$1_context, $$2).add($$9);
-                if (getHorizontalDistanceSqr($$10) > getHorizontalDistanceSqr($$8)) {
-                    $$8 = $$10;
-                }
-            }
-
-            if (getHorizontalDistanceSqr($$8) > getHorizontalDistanceSqr($$3)) {
-                Vector3d rotatenew = $$8;
-                rotatenew = RotationUtil.vecPlayerToWorld(rotatenew, GravityAPI.getGravityDirection((Entity) (Object) this));
-
-                cir.setReturnValue(RotationUtil.vecWorldToPlayer($$8.add(collideBoundingBox(new Vector3d(0.0, -$$8.y + $$0.y, 0.0), $$1.move(rotatenew), this.level, $$1_context, $$2)), gravityDirection));
-                return;
-            }
+        if (gravityDirection != Direction.DOWN){
+            $$0 = RotationUtil.vecWorldToPlayer($$0, gravityDirection);
         }
-
-        cir.setReturnValue(RotationUtil.vecWorldToPlayer($$3, gravityDirection));
     }
 
 
@@ -946,7 +908,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
 
     @Inject(
-            method = "push",
+            method = "push(Lnet/minecraft/entity/Entity;)V",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -1024,7 +986,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
         if (gravityDirection == Direction.DOWN) return;
 
         Vector3d rotate = new Vector3d($$0, $$1, $$2);
-        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityAPI.getGravityDirection((Entity) (Object) this));
+        rotate = RotationUtil.vecWorldToPlayer(rotate, GravityAPI.getGravityDirection((Entity) (Object) this));
         cir.setReturnValue(this.isFree(this.getBoundingBox().move(rotate.x, rotate.y, rotate.z)));
     }
 

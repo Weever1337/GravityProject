@@ -28,19 +28,19 @@ public abstract class GravityEntityCollisionContextMixin {
         Direction gravityDirection = GravityAPI.getGravityDirection(this.entity);
         if (gravityDirection == Direction.DOWN) return;
 
-        double realBottom = RotationUtil.boxWorldToPlayer(entity.getBoundingBox(), gravityDirection).minY;
+        double realBottom = RotationUtil.boxPlayerToWorld(entity.getBoundingBox(), gravityDirection).minY;
 
         if (shape.isEmpty()) {
             cir.setReturnValue(true);
             return;
         }
 
-        AxisAlignedBB shapeBox = RotationUtil.boxWorldToPlayer(
+        AxisAlignedBB shapeBox = RotationUtil.boxPlayerToWorld(
                 shape.bounds().inflate(-9.999999747378752E-6D), gravityDirection
         );
-        AxisAlignedBB posBox = RotationUtil.boxWorldToPlayer(new AxisAlignedBB(pos), gravityDirection);
+        AxisAlignedBB posBox = RotationUtil.boxPlayerToWorld(new AxisAlignedBB(pos), gravityDirection);
         cir.setReturnValue(
-                realBottom > posBox.minY + shapeBox.maxX
+                realBottom > posBox.minY + shapeBox.maxY
         );
     }
 

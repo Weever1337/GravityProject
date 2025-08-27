@@ -30,4 +30,8 @@ public class ModItems {
             new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.EAST.name()).tab(GRAVITY_TAB).stacksTo(1)));
     public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_WEST = ITEMS.register("gravity_changer_west", () ->
             new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.WEST.name()).tab(GRAVITY_TAB).stacksTo(1)));
+    public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_NORTH = ITEMS.register("gravity_changer_north", () ->
+            new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.NORTH.name()).tab(GRAVITY_TAB).stacksTo(1)));
+    public static final RegistryObject<GravityChanger> GRAVITY_CHANGER_SOUTH = ITEMS.register("gravity_changer_south", () ->
+            new GravityChanger((GravityChanger.GravityProperties) new GravityChanger.GravityProperties().gravityDirection(Direction.SOUTH.name()).tab(GRAVITY_TAB).stacksTo(1)));
 }

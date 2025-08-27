@@ -180,7 +180,7 @@ public abstract class GravityEntityRenderDispatcherMixin {
             return box;
         }
 
-        return RotationUtil.boxWorldToPlayer(box, gravityDirection);
+        return RotationUtil.boxPlayerToWorld(box, gravityDirection);
     }
 
     @ModifyVariable(

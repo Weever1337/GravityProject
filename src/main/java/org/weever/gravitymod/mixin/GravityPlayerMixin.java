@@ -56,48 +56,13 @@ public abstract class GravityPlayerMixin extends LivingEntity {
             method = "travel",
             at = @At(
                     value = "HEAD"
-            ),
-            cancellable = true
+            )
     )
     private void gravitymod$gravityTravel(Vector3d $$0, CallbackInfo ci) {
         Direction gravityDirection = GravityAPI.getGravityDirection(gravitymod$this());
-        if (gravityDirection == Direction.DOWN)
-            return;
-        ci.cancel();
-
-        double $$1 = this.getX();
-        double $$2 = this.getY();
-        double $$3 = this.getZ();
-        if (this.isSwimming() && !this.isPassenger()) {
-            double $$4 = RotationUtil.vecWorldToPlayer(this.getLookAngle(), gravityDirection).y;
-            double $$5 = $$4 < -0.2 ? 0.085 : 0.06;
-            Vector3d rotate = new Vector3d(0.0D, 1.0D - 0.1D, 0.0D);
-            rotate = RotationUtil.vecPlayerToWorld(rotate, GravityAPI.getGravityDirection(this));
-            if ($$4 <= 0.0
-                    || this.jumping
-                    || !this.level.getBlockState(BlockPosUtil.containing(
-                    (double) this.getX() - rotate.x,
-                    (double) (this.getY() + 1.0 - 0.1) - rotate.y + (1.0D - 0.1D),
-                    (double) this.getZ() - rotate.z)
-            ).getFluidState().isEmpty()) {
-                Vector3d $$6 = this.getDeltaMovement();
-                this.setDeltaMovement($$6.add(0.0, ($$4 - $$6.y) * $$5, 0.0));
-            }
+        if (gravityDirection != Direction.DOWN){
+            $$0 = RotationUtil.vecPlayerToWorld($$0, gravityDirection);
         }
-
-        if (this.abilities.flying && !this.isPassenger()) {
-            double $$7 = this.getDeltaMovement().y;
-            super.travel($$0);
-            Vector3d $$8 = this.getDeltaMovement();
-            this.setDeltaMovement($$8.x, $$7 * 0.6, $$8.z);
-            this.fallDistance = 0.0F;
-            this.setSharedFlag(7, false);
-        } else {
-            super.travel($$0);
-        }
-
-        this.checkMovementStatistics(this.getX() - $$1, this.getY() - $$2, this.getZ() - $$3);
-
     }
 
 

@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.weever.gravitymod.GravityMod;
 import org.weever.gravitymod.access.IGravityLivingEntity;
 import org.weever.gravitymod.util.GravityAPI;
 import org.weever.gravitymod.util.RotationUtil;
@@ -147,6 +148,8 @@ public abstract class GravityLivingEntityMixin extends Entity implements IGravit
     @Shadow
     protected abstract void onEffectUpdated(EffectInstance p_70695_1_, boolean p_70695_2_);
 
+    @Shadow
+    public abstract void travel(Vector3d pTravelVector);
     public LivingEntity gravitymod$this() {
         return ((LivingEntity) (Object) this);
     }
@@ -182,140 +185,9 @@ public abstract class GravityLivingEntityMixin extends Entity implements IGravit
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
     private void gravitymod$travelWithGravity(Vector3d $$0, CallbackInfo ci) {
         Direction gravityDirection = GravityAPI.getGravityDirection(gravitymod$this());
-        if (gravityDirection == Direction.DOWN)
-            return;
-
-        ci.cancel();
-
-        if (this.isControlledByLocalInstance()) {
-            double $$1 = 0.08;
-            boolean $$2 = this.getDeltaMovement().y <= 0.0;
-            if ($$2 && this.hasEffect(Effects.SLOW_FALLING)) {
-                $$1 = 0.01;
-            }
-
-            FluidState $$3 = this.level.getFluidState(this.blockPosition());
-            if (this.isInWater() && this.isAffectedByFluids() && !this.canStandOnFluid($$3.getType())) {
-                double $$4 = RotationUtil.vecWorldToPlayer(position(), gravityDirection).y;
-                float $$5 = this.isSprinting() ? 0.9F : this.getWaterSlowDown();
-                float $$6 = 0.02F;
-                float $$7 = (float) EnchantmentHelper.getDepthStrider(gravitymod$this());
-                if ($$7 > 3.0F) {
-                    $$7 = 3.0F;
-                }
-
-                if (!this.isOnGround()) {
-                    $$7 *= 0.5F;
-                }
-
-                if ($$7 > 0.0F) {
-                    $$5 += (0.54600006F - $$5) * $$7 / 3.0F;
-                    $$6 += (this.getSpeed() - $$6) * $$7 / 3.0F;
-                }
-
-                if (this.hasEffect(Effects.DOLPHINS_GRACE)) {
-                    $$5 = 0.96F;
-                }
-
-                this.moveRelative($$6, $$0);
-                this.move(MoverType.SELF, this.getDeltaMovement());
-                Vector3d $$8 = this.getDeltaMovement();
-                if (this.horizontalCollision && this.onClimbable()) {
-                    $$8 = new Vector3d($$8.x, 0.2, $$8.z);
-                }
-
-                this.setDeltaMovement($$8.multiply((double) $$5, 0.8F, (double) $$5));
-                Vector3d $$9 = this.getFluidFallingAdjustedMovement($$1, $$2, this.getDeltaMovement());
-                this.setDeltaMovement($$9);
-                if (this.horizontalCollision && this.isFree($$9.x, $$9.y + 0.6F - RotationUtil.vecWorldToPlayer(position(), gravityDirection).y + $$4, $$9.z)) {
-                    this.setDeltaMovement($$9.x, 0.3F, $$9.z);
-                }
-            } else if (this.isInLava() && this.isAffectedByFluids() && !this.canStandOnFluid($$3.getType())) {
-                double $$10 = RotationUtil.vecWorldToPlayer(position(), gravityDirection).y;
-                this.moveRelative(0.02F, $$0);
-                this.move(MoverType.SELF, this.getDeltaMovement());
-                if (this.getFluidHeight(FluidTags.LAVA) <= this.getFluidJumpThreshold()) {
-                    this.setDeltaMovement(this.getDeltaMovement().multiply(0.5, 0.8F, 0.5));
-                    Vector3d $$11 = this.getFluidFallingAdjustedMovement($$1, $$2, this.getDeltaMovement());
-                    this.setDeltaMovement($$11);
-                } else {
-                    this.setDeltaMovement(this.getDeltaMovement().scale(0.5));
-                }
-
-                if (!this.isNoGravity()) {
-                    this.setDeltaMovement(this.getDeltaMovement().add(0.0, -$$1 / 4.0, 0.0));
-                }
-
-                Vector3d $$12 = this.getDeltaMovement();
-                if (this.horizontalCollision && this.isFree($$12.x, $$12.y + 0.6F - RotationUtil.vecWorldToPlayer(position(), gravityDirection).y + $$10, $$12.z)) {
-                    this.setDeltaMovement($$12.x, 0.3F, $$12.z);
-                }
-            } else if (this.isFallFlying()) {
-                Vector3d $$13 = this.getDeltaMovement();
-                if ($$13.y > -0.5D) {
-                    this.fallDistance = 1.0F;
-                }
-
-                Vector3d $$14 = RotationUtil.vecWorldToPlayer(this.getLookAngle(), gravityDirection);
-                float $$15 = this.xRot * (float) (Math.PI / 180.0);
-                double $$16 = Math.sqrt($$14.x * $$14.x + $$14.z * $$14.z);
-                double $$17 = Math.sqrt(getHorizontalDistanceSqr($$13));
-                double $$18 = $$14.length();
-                double $$19 = Math.cos((double) $$15);
-                $$19 = $$19 * $$19 * Math.min(1.0, $$18 / 0.4);
-                $$13 = this.getDeltaMovement().add(0.0, $$1 * (-1.0 + $$19 * 0.75), 0.0);
-                if ($$13.y < 0.0 && $$16 > 0.0) {
-                    double $$20 = $$13.y * -0.1 * $$19;
-                    $$13 = $$13.add($$14.x * $$20 / $$16, $$20, $$14.z * $$20 / $$16);
-                }
-
-                if ($$15 < 0.0F && $$16 > 0.0) {
-                    double $$21 = $$17 * (double) (-Mth.sin($$15)) * 0.04;
-                    $$13 = $$13.add(-$$14.x * $$21 / $$16, $$21 * 3.2, -$$14.z * $$21 / $$16);
-                }
-
-                if ($$16 > 0.0) {
-                    $$13 = $$13.add(($$14.x / $$16 * $$17 - $$13.x) * 0.1, 0.0, ($$14.z / $$16 * $$17 - $$13.z) * 0.1);
-                }
-
-                this.setDeltaMovement($$13.multiply(0.99F, 0.98F, 0.99F));
-                this.move(MoverType.SELF, this.getDeltaMovement());
-                if (this.horizontalCollision && !this.level.isClientSide) {
-                    double $$22 = Math.sqrt(getHorizontalDistanceSqr(this.getDeltaMovement()));
-                    double $$23 = $$17 - $$22;
-                    float $$24 = (float) ($$23 * 10.0 - 3.0);
-                    if ($$24 > 0.0F) {
-                        this.playSound(this.getFallDamageSound((int) $$24), 1.0F, 1.0F);
-                        this.hurt(DamageSource.FLY_INTO_WALL, $$24);
-                    }
-                }
-
-                if (this.isOnGround() && !this.level.isClientSide) {
-                    this.setSharedFlag(7, false);
-                }
-            } else {
-                BlockPos $$25 = this.getBlockPosBelowThatAffectsMyMovement();
-                float $$26 = this.level.getBlockState($$25).getBlock().getFriction();
-                float $$27 = this.isOnGround() ? $$26 * 0.91F : 0.91F;
-                Vector3d $$28 = this.handleRelativeFrictionAndCalculateMovement($$0, $$26);
-                double $$29 = $$28.y;
-                if (this.hasEffect(Effects.LEVITATION)) {
-                    $$29 += (0.05 * (double) (this.getEffect(Effects.LEVITATION).getAmplifier() + 1) - $$28.y) * 0.2;
-                } else if (this.level.isClientSide && !this.level.hasChunkAt($$25)) {
-                    if (this.getY() > 0.0D) {
-                        $$29 = -0.1;
-                    } else {
-                        $$29 = 0.0;
-                    }
-                } else if (!this.isNoGravity()) {
-                    $$29 -= $$1;
-                }
-
-                this.setDeltaMovement($$28.x * (double) $$27, $$29 * 0.98F, $$28.z * (double) $$27);
-            }
+        if (gravityDirection != Direction.DOWN){
+            $$0 = RotationUtil.vecPlayerToWorld($$0, gravityDirection);
         }
-
-        this.calculateEntityAnimation((LivingEntity) (Object) this, this instanceof IFlyingAnimal);
     }
 
 
@@ -380,7 +252,7 @@ public abstract class GravityLivingEntityMixin extends Entity implements IGravit
         if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
             box = box.move(0.0D, -1.0E-6D, 0.0D);
         }
-        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection));
+        cir.setReturnValue(RotationUtil.boxWorldToPlayer(box, gravityDirection));
     }
 
     /**
