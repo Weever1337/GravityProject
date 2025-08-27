@@ -5,7 +5,9 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3f;
 import org.joml.Quaternionf;
+import org.spongepowered.asm.mixin.Unique;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
@@ -49,10 +51,14 @@ public abstract class GravityCameraMixin {
 
     @Shadow protected abstract double getMaxZoom(double d);
 
-    @Shadow protected abstract void move(double d, double e, double f);
-
     @Shadow
     private IBlockReader level;
+
+    @Shadow
+    private Vector3d position;
+
+    @Shadow
+    protected abstract void move(double pDistanceOffset, double pVerticalOffset, double pHorizontalOffset);
 
     @Inject(
             method = "setup",
@@ -86,7 +92,6 @@ public abstract class GravityCameraMixin {
             this.detached = $$2;
 
             this.setRotation(focusedEntity.getViewYRot(tickDelta), focusedEntity.getViewXRot(tickDelta));
-
 
             Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
 
@@ -132,7 +137,8 @@ public abstract class GravityCameraMixin {
     )
     private void gravitymod$setRotation(float pPitch, float pYaw, CallbackInfo ci) {
         if (this.entity != null) {
-            Direction gravityDirection = GravityAPI.getGravityDirection(this.entity);
+
+            Direction gravityDirection = GravityAPI.getGravityDirection(entity);
             RotationAnimation animation = GravityAPI.getRotationAnimation(entity);
             if (animation == null) {
                 return;
@@ -140,19 +146,12 @@ public abstract class GravityCameraMixin {
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
                 return;
             }
-
-            float partialTick = Minecraft.getInstance().getFrameTime();
+            float partialTick = Minecraft.getInstance().getDeltaFrameTime();
             long timeMs = entity.level.getGameTime() * 50 + (long) (partialTick * 50);
-
-//            Quaternion rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
-//            rotation.conj();
-//            rotation.mul(this.rotation);
-//            this.rotation.set(rotation.i(), rotation.j(), rotation.k(), rotation.r());
-
-            Quaternion gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).copy();
-            Quaternion result = new Quaternion(this.rotation);
-            result.mul(gravityRotation);
-            this.rotation.set(result.i(), result.j(), result.k(), result.r()); // todo: fix rotations
+            Quaternion rotation = new Quaternion(animation.getCurrentGravityRotation(gravityDirection, timeMs));
+            rotation.conj();
+            rotation.mul(this.rotation);
+            this.rotation.set(rotation.i(), rotation.j(), rotation.k(), rotation.r());
         }
     }
 }

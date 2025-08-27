@@ -26,7 +26,7 @@ public abstract class GravityGameRendererMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/mojang/blaze3d/matrix/MatrixStack;mulPose(Lnet/minecraft/util/math/vector/Quaternion;)V",
-                    ordinal = 3,
+                    ordinal = 4,
                     shift = At.Shift.AFTER
             )
     )
