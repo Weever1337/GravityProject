@@ -366,7 +366,10 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             }
         }
 
-        return new Vector3d(movingDirection.step()).scale(offset);
+        return new Vector3d(new Vector3f(
+                (float)movingDirection.getStepX(), 
+                (float)movingDirection.getStepY(), 
+                (float)movingDirection.getStepZ())).scale(offset);
     }
 
     @Unique

@@ -271,7 +271,7 @@ public abstract class RotationUtil {
 
     static {
         for (int i = 0; i < 6; i++) {
-            Quaternion quaternion = WORLD_ROTATION_QUATERNIONS[i].copy();
+            Quaternion quaternion = new Quaternion(WORLD_ROTATION_QUATERNIONS[i]);
             quaternion.conj();
             ENTITY_ROTATION_QUATERNIONS[i] = quaternion;
         }
