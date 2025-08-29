@@ -3,6 +3,7 @@ package org.weever.gravitymod.mixin;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.EnderCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,6 +11,7 @@ import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -21,6 +23,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ReuseableStream;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
+import org.spongepowered.asm.mixin.*;
+import org.weever.gravitymod.network.ModPackets;
+import org.weever.gravitymod.network.SyncBoundingBoxPacket;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -34,10 +40,6 @@ import net.minecraft.world.border.WorldBorder;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -60,6 +62,8 @@ import static net.minecraft.entity.Entity.collideBoundingBoxLegacy;
 
 @Mixin(Entity.class)
 public abstract class GravityEntityMixin implements IGravityEntity {
+    @Shadow
+    private int id;
     @Shadow
     public abstract int getId();
     @Shadow
@@ -232,7 +236,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     ) {
 
         // update bounding box
-        setBoundingBox(dimensions.makeBoundingBox(this.position));
+        setBoundingBox(gravityProject$makeBoundingBox(position().x, position().y, position().z));
 
         // A weird thing is that,
         // using `entity.setPos(entity.position())` to a painting on client side
@@ -451,7 +455,12 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             method = "setPos",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntitySize;makeBoundingBox(DDD)Lnet/minecraft/util/math/AxisAlignedBB;"))
     private AxisAlignedBB inject_calculateBoundingBox(EntitySize instance, double pX, double pY, double pZ) {
-        AxisAlignedBB originalBb = instance.makeBoundingBox(pX, pY, pZ);
+        return gravityProject$makeBoundingBox(pX, pY, pZ);
+    }
+
+    @Unique
+    private AxisAlignedBB gravityProject$makeBoundingBox(double pX, double pY, double pZ){
+        AxisAlignedBB originalBb = dimensions.makeBoundingBox(pX, pY, pZ);
         if (this.getEntityData() != null){
             Entity entity = ((Entity) (Object) this);
             if (entity instanceof ProjectileEntity) return originalBb;
@@ -459,9 +468,6 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             if (gravityDirection == Direction.DOWN) return originalBb;
 
             AxisAlignedBB box = originalBb.move(this.position.reverse());
-            if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
-                box = box.move(0.0D, -1.0E-6D, 0.0D);
-            }
             return RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position);
         }
         return originalBb;
@@ -629,6 +635,8 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
         this.moveDist = moveDistBeforeUpdate + (correctSpeedFactor - moveDistBeforeUpdate) * 0.4F;
     }
+
+
 
 
     @Inject(
@@ -1097,6 +1105,10 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     public static Vector3d collideBoundingBox(Vector3d pVec, AxisAlignedBB pCollisionBox, IWorldReader pLevel, ISelectionContext pSelectionContext, ReuseableStream<VoxelShape> pPotentialHits) {
         return null;
     }
+
+    @Shadow public abstract void setPosRaw(double x, double y, double z);
+
+    @Shadow public abstract boolean isAddedToWorld();
 
     @Shadow public abstract boolean isPushedByFluid();
 
