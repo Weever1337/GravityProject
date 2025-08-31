@@ -26,7 +26,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import org.spongepowered.asm.mixin.*;
 import org.weever.gravitymod.network.ModPackets;
-import org.weever.gravitymod.network.SyncBoundingBoxPacket;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -367,7 +366,10 @@ public abstract class GravityEntityMixin implements IGravityEntity {
             }
         }
 
-        return new Vector3d(movingDirection.step()).scale(offset);
+        return new Vector3d(new Vector3f(
+                (float)movingDirection.getStepX(), 
+                (float)movingDirection.getStepY(), 
+                (float)movingDirection.getStepZ())).scale(offset);
     }
 
     @Unique
