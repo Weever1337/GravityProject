@@ -8,6 +8,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,15 +19,14 @@ import org.weever.gravitymod.util.RotationUtil;
 @Mixin(OverlayRenderer.class)
 public abstract class GravityScreenEffectRenderer {
     @Inject(
-            method = "getViewBlockingState",
+            method = "getOverlayBlock",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
-    private static void inject_getInWallBlockState(PlayerEntity player, CallbackInfoReturnable<BlockState> cir) {
+    private static void gravitymod$inject_getOverlayBlock(PlayerEntity player, CallbackInfoReturnable<Pair<BlockState, BlockPos>> cir) {
         Direction gravityDirection = GravityAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) return;
-
-        cir.cancel();
 
         BlockPos.Mutable mutable = new BlockPos.Mutable();
 
@@ -39,7 +39,8 @@ public abstract class GravityScreenEffectRenderer {
             mutable.set(d, e, f);
             BlockState blockState = player.level.getBlockState(mutable);
             if (blockState.getRenderShape() != BlockRenderType.INVISIBLE && blockState.isViewBlocking(player.level, mutable)) {
-                cir.setReturnValue(blockState);
+                cir.setReturnValue(Pair.of(blockState, mutable.immutable()));
+                return;
             }
         }
 

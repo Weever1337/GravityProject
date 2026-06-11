@@ -52,8 +52,8 @@ public abstract class GravityServerPlayNetHandlerImplMixin {
         double $$2 =  gravityProjectFixing$clampHorizontal($$0.getX(this.player.getX()));
         double $$3 = gravityProjectFixing$clampVertical($$0.getY(this.player.getY()));
         double $$4 = gravityProjectFixing$clampHorizontal($$0.getZ(this.player.getZ()));
-        Vector3d myPositionVec = RotationUtil.vecPlayerToWorld($$2,$$3,$$4,gravityDirection);
-        Vector3d myLastPositionVec = RotationUtil.vecPlayerToWorld(lastGoodX,lastGoodY,lastGoodZ,gravityDirection);
+        Vector3d myPositionVec = RotationUtil.vecWorldToPlayer($$2,$$3,$$4,gravityDirection);
+        Vector3d myLastPositionVec = RotationUtil.vecWorldToPlayer(lastGoodX,lastGoodY,lastGoodZ,gravityDirection);
 
         return (myPositionVec.y - myLastPositionVec.y > 0);
     }

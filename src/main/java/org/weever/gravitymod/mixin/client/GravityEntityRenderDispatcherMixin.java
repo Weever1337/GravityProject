@@ -169,10 +169,7 @@ public abstract class GravityEntityRenderDispatcherMixin {
 
     @ModifyVariable(
             method = "renderBox",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLineBox(Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;Lnet/minecraft/util/math/AxisAlignedBB;FFFF)V"
-            ),
+            at = @At("STORE"),
             ordinal = 0)
     private AxisAlignedBB gravitymod$renderHitboxAAB(AxisAlignedBB box, MatrixStack p_229094_1_, IVertexBuilder p_229094_2_, Entity entity, float p_229094_4_, float p_229094_5_, float p_229094_6_) {
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
@@ -180,7 +177,7 @@ public abstract class GravityEntityRenderDispatcherMixin {
             return box;
         }
 
-        return RotationUtil.boxPlayerToWorld(box, gravityDirection);
+        return RotationUtil.boxWorldToPlayer(box, gravityDirection);
     }
 
     @ModifyVariable(

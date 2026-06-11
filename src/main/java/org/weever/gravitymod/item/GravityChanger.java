@@ -24,9 +24,9 @@ public class GravityChanger extends Item {
             Direction playerGravityDirection = GravityAPI.getGravityDirection(player);
             Direction gravityDirection = Direction.valueOf(this.gravityDirection.toUpperCase());
             if (playerGravityDirection != Direction.DOWN && playerGravityDirection == gravityDirection) {
-                ((IGravityEntity) player).gravitymod$setGravityDirection(Direction.DOWN);
+                ((IGravityEntity) player).gravitymod$setBaseGravityDirection(Direction.DOWN);
             } else {
-                ((IGravityEntity) player).gravitymod$setGravityDirection(gravityDirection);
+                ((IGravityEntity) player).gravitymod$setBaseGravityDirection(gravityDirection);
             }
         }
         return ActionResult.pass(this.getDefaultInstance());

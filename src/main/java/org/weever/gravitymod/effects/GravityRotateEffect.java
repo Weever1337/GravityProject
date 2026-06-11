@@ -29,6 +29,6 @@ public class GravityRotateEffect extends Effect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
-        ((IGravityEntity) entity).gravitymod$setGravityDirection(direction);
+        ((IGravityEntity) entity).gravitymod$applyGravityEffect(direction);
     }
 }

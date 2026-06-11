@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.weever.gravitymod.GravityMod;
@@ -182,14 +183,21 @@ public abstract class GravityLivingEntityMixin extends Entity implements IGravit
         this.animationPosition += animationSpeed;
     }
 
-    @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
-    private void gravitymod$travelWithGravity(Vector3d $$0, CallbackInfo ci) {
-        Direction gravityDirection = GravityAPI.getGravityDirection(gravitymod$this());
-        if (gravityDirection != Direction.DOWN){
-            $$0 = RotationUtil.vecPlayerToWorld($$0, gravityDirection);
+    @Redirect(
+            method = "travel",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/LivingEntity;getLookAngle()Lnet/minecraft/util/math/vector/Vector3d;"
+            )
+    )
+    private Vector3d gravitymod$elytraLocalLookAngle(LivingEntity self) {
+        Vector3d look = self.getLookAngle();
+        Direction gravityDirection = GravityAPI.getGravityDirection(self);
+        if (gravityDirection == Direction.DOWN) {
+            return look;
         }
+        return RotationUtil.vecWorldToPlayer(look, gravityDirection);
     }
-
 
     @Inject(
             method = "playBlockFallSound",

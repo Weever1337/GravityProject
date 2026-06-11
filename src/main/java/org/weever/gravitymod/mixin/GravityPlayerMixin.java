@@ -53,20 +53,6 @@ public abstract class GravityPlayerMixin extends LivingEntity {
     }
 
     @Inject(
-            method = "travel",
-            at = @At(
-                    value = "HEAD"
-            )
-    )
-    private void gravitymod$gravityTravel(Vector3d $$0, CallbackInfo ci) {
-        Direction gravityDirection = GravityAPI.getGravityDirection(gravitymod$this());
-        if (gravityDirection != Direction.DOWN){
-            $$0 = RotationUtil.vecPlayerToWorld($$0, gravityDirection);
-        }
-    }
-
-
-    @Inject(
             method = "drop(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/item/ItemEntity;",
             at = @At(
                     value = "HEAD"

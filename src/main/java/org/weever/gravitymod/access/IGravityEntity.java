@@ -8,6 +8,12 @@ public interface IGravityEntity {
     void gravitymod$setGravityDirection(Direction direction);
     void gravitymod$setBaseGravityDirection(Direction direction);
 
+    /**
+     * Sets the gravity direction for the current tick only;
+     * once no effect calls this anymore, gravity falls back to the base direction
+     */
+    void gravitymod$applyGravityEffect(Direction direction);
+
 
     double gravitymod$getGravityStrength();
     void gravitymod$setGravityStrength(double str);
