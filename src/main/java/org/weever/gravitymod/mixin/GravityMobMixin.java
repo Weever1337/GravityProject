@@ -6,7 +6,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3d;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.weever.gravitymod.util.RotationUtil;
+import org.weever.gravitymod.v1_20_1.util.BlockPosUtil;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -72,5 +74,20 @@ public abstract class GravityMobMixin extends LivingEntity {
 
     protected GravityMobMixin(EntityType<? extends LivingEntity> $$0, World $$1) {
         super($$0, $$1);
+    }
+
+    @Redirect(
+            method = "isSunBurnTick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/World;canSeeSky(Lnet/minecraft/util/math/BlockPos;)Z"
+            )
+    )
+    private boolean gravitymod$sunBurnSkyCheck(World level, net.minecraft.util.math.BlockPos pos) {
+        Direction gravityDirection = GravityAPI.getGravityDirection(this);
+        if (gravityDirection == Direction.DOWN) {
+            return level.canSeeSky(pos);
+        }
+        return level.canSeeSky(BlockPosUtil.containing(this.getEyePosition(1.0F)));
     }
 }

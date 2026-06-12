@@ -669,6 +669,20 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     }
 
     @Inject(
+            method = "getBrightness",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void gravitymod$getBrightness(CallbackInfoReturnable<Float> cir) {
+        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
+        if (gravityDirection == Direction.DOWN) return;
+
+        cir.setReturnValue(this.level.hasChunkAt(this.blockPosition)
+                ? this.level.getBrightness(BlockPosUtil.containing(this.getEyePosition(1.0F)))
+                : 0.0F);
+    }
+
+    @Inject(
             method = "getOnPos",
             at = @At("HEAD"),
             cancellable = true
