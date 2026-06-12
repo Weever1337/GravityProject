@@ -605,48 +605,6 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     }
 
     @Inject(
-            method = "move",
-            at = @At("TAIL")
-    )
-    private void gravitymod$correctGravityWalkAndMoveDistance(MoverType moverType, Vector3d requestedMovement, CallbackInfo ci) {
-        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) {
-            return;
-        }
-
-        double worldDx = this.getX() - this.xOld;
-        double worldDy = this.getY() - this.yOld;
-        double worldDz = this.getZ() - this.zOld;
-
-        double vanillaHorizontalDist = Math.sqrt(worldDx * worldDx + worldDz * worldDz);
-
-        this.walkDist = (float)((double)this.walkDist - vanillaHorizontalDist * 0.6D);
-
-        float wrongSpeedFactor = (float)vanillaHorizontalDist * 4.0F;
-        if (wrongSpeedFactor > 1.0F) {
-            wrongSpeedFactor = 1.0F;
-        }
-
-        float moveDistBeforeUpdate = (this.moveDist - wrongSpeedFactor * 0.4f) / 0.6f;
-
-        Vector3d actualWorldMovement = new Vector3d(worldDx, worldDy, worldDz);
-        Vector3d actualLocalMovement = RotationUtil.vecWorldToPlayer(actualWorldMovement, gravityDirection);
-        double correctLocalHorizontalDist = Math.sqrt(actualLocalMovement.x * actualLocalMovement.x + actualLocalMovement.z * actualLocalMovement.z);
-
-        this.walkDist = (float)((double)this.walkDist + correctLocalHorizontalDist * 0.6D);
-
-        float correctSpeedFactor = (float)correctLocalHorizontalDist * 4.0F;
-        if (correctSpeedFactor > 1.0F) {
-            correctSpeedFactor = 1.0F;
-        }
-
-        this.moveDist = moveDistBeforeUpdate + (correctSpeedFactor - moveDistBeforeUpdate) * 0.4F;
-    }
-
-
-
-
-    @Inject(
             method = "getOnPos",
             at = @At("HEAD"),
             cancellable = true
