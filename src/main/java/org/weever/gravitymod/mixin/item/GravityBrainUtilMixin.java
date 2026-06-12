@@ -16,12 +16,11 @@ import org.weever.gravitymod.util.GravityAPI;
 @Mixin(BrainUtil.class)
 public class GravityBrainUtilMixin {
     @Inject(
-            method = "throwItem",
+            method = "throwItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/vector/Vector3d;)V",
             at = @At(
                     value = "HEAD"
             ),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private static void gravitymod$throwItem(LivingEntity pLivingEntity, ItemStack pStack, Vector3d pOffset, CallbackInfo ci) {
         Direction gravityDirection = GravityAPI.getGravityDirection(pLivingEntity);
