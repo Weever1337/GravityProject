@@ -605,6 +605,70 @@ public abstract class GravityEntityMixin implements IGravityEntity {
     }
 
     @Inject(
+            method = "maybeBackOffFromEdge",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void gravitymod$mobEdgeProtection(Vector3d movement, MoverType moverType, CallbackInfoReturnable<Vector3d> cir) {
+        Entity self = (Entity) (Object) this;
+        if (!(self instanceof MobEntity)) return;
+        if (moverType != MoverType.SELF || !this.onGround) return;
+
+        Direction gravityDirection = GravityAPI.getGravityDirection(self);
+        if (gravityDirection == Direction.DOWN) return;
+
+        Vector3d localMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
+        double dx = localMovement.x;
+        double dz = localMovement.z;
+        if (dx == 0.0D && dz == 0.0D) return;
+
+        double probeDepth = self.getMaxFallDistance();
+
+        while (dx != 0.0D && this.level.noCollision(self, getBoundingBox().move(
+                RotationUtil.vecPlayerToWorld(dx, -probeDepth, 0.0D, gravityDirection)))) {
+            if (dx < 0.05D && dx >= -0.05D) {
+                dx = 0.0D;
+            } else if (dx > 0.0D) {
+                dx -= 0.05D;
+            } else {
+                dx += 0.05D;
+            }
+        }
+
+        while (dz != 0.0D && this.level.noCollision(self, getBoundingBox().move(
+                RotationUtil.vecPlayerToWorld(0.0D, -probeDepth, dz, gravityDirection)))) {
+            if (dz < 0.05D && dz >= -0.05D) {
+                dz = 0.0D;
+            } else if (dz > 0.0D) {
+                dz -= 0.05D;
+            } else {
+                dz += 0.05D;
+            }
+        }
+
+        while (dx != 0.0D && dz != 0.0D && this.level.noCollision(self, getBoundingBox().move(
+                RotationUtil.vecPlayerToWorld(dx, -probeDepth, dz, gravityDirection)))) {
+            if (dx < 0.05D && dx >= -0.05D) {
+                dx = 0.0D;
+            } else if (dx > 0.0D) {
+                dx -= 0.05D;
+            } else {
+                dx += 0.05D;
+            }
+
+            if (dz < 0.05D && dz >= -0.05D) {
+                dz = 0.0D;
+            } else if (dz > 0.0D) {
+                dz -= 0.05D;
+            } else {
+                dz += 0.05D;
+            }
+        }
+
+        cir.setReturnValue(RotationUtil.vecPlayerToWorld(dx, localMovement.y, dz, gravityDirection));
+    }
+
+    @Inject(
             method = "getOnPos",
             at = @At("HEAD"),
             cancellable = true
@@ -955,9 +1019,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
                 this.setDeltaMovement(this.getDeltaMovement().add(RotationUtil.vecWorldToPlayer($$12, gravityDirection)));
             }
 
-            if ($$0 instanceof Tag) {
-                this.fluidHeight.put((Tag<Fluid>) $$0, $$9);
-            }
+            this.fluidHeight.put($$0, $$9);
             cir.setReturnValue($$11);
         }
     }
@@ -1192,7 +1254,7 @@ public abstract class GravityEntityMixin implements IGravityEntity {
 
     @Shadow public abstract boolean isPushedByFluid();
 
-    @Shadow protected Object2DoubleMap<Tag<Fluid>> fluidHeight;
+    @Shadow protected Object2DoubleMap<ITag<Fluid>> fluidHeight;
 
     @Shadow public abstract void setDeltaMovement(Vector3d Vector3d);
 

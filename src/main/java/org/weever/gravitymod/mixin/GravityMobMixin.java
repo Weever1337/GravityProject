@@ -5,6 +5,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3d;
+import org.weever.gravitymod.util.RotationUtil;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,20 +53,21 @@ public abstract class GravityMobMixin extends LivingEntity {
             return;
         ci.cancel();
 
-        double $$3 = $$0.getEyePosition(1.0F).x - this.getEyePosition(1.0F).x;
-        double $$4 = $$0.getEyePosition(1.0F).z - this.getEyePosition(1.0F).z;
-        double $$6;
+        Vector3d targetPoint;
         if ($$0 instanceof LivingEntity) {
-            $$6 = $$0.getEyePosition(1.0F).y - this.getEyePosition(1.0F).y;
+            targetPoint = $$0.getEyePosition(1.0F);
         } else {
-            $$6 = ($$0.getBoundingBox().minY + $$0.getBoundingBox().maxY) / 2.0 - getEyeY();
+            targetPoint = $$0.getBoundingBox().getCenter();
         }
 
-        double $$8 = Math.sqrt($$3 * $$3 + $$4 * $$4);
-        float $$9 = (float)(Mth.atan2($$4, $$3) * 180.0F / (float)Math.PI) - 90.0F;
-        float $$10 = (float)(-(Mth.atan2($$6, $$8) * 180.0F / (float)Math.PI));
-        this.xRot = (this.rotlerp(this.xRot, $$10, $$2));
-        this.yRot = (this.rotlerp(this.yRot, $$9, $$1));
+        Vector3d local = RotationUtil.vecWorldToPlayer(
+                targetPoint.subtract(this.getEyePosition(1.0F)), gravityDirection2);
+        double horizontal = Math.sqrt(local.x * local.x + local.z * local.z);
+        float yaw = (float) (Mth.atan2(local.z, local.x) * 180.0F / (float) Math.PI) - 90.0F;
+        float pitch = (float) (-(Mth.atan2(local.y, horizontal) * 180.0F / (float) Math.PI));
+        this.xRot = (this.rotlerp(this.xRot, pitch, $$2));
+        this.yRot = (this.rotlerp(this.yRot, yaw, $$1));
+        this.yHeadRot = this.rotlerp(this.yHeadRot, yaw, $$1);
     }
 
     protected GravityMobMixin(EntityType<? extends LivingEntity> $$0, World $$1) {

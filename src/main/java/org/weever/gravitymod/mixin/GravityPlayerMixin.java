@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.weever.gravitymod.util.GravityAPI;
@@ -107,6 +108,38 @@ public abstract class GravityPlayerMixin extends LivingEntity {
 
             cir.setReturnValue($$4);
         }
+    }
+
+    @Redirect(
+            method = "travel",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getLookAngle()Lnet/minecraft/util/math/vector/Vector3d;"
+            )
+    )
+    private Vector3d gravitymod$swimLocalLookAngle(PlayerEntity self) {
+        Vector3d look = self.getLookAngle();
+        Direction gravityDirection = GravityAPI.getGravityDirection(self);
+        if (gravityDirection == Direction.DOWN) {
+            return look;
+        }
+        return RotationUtil.vecWorldToPlayer(look, gravityDirection);
+    }
+
+    @Redirect(
+            method = "travel",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"
+            )
+    )
+    private net.minecraft.block.BlockState gravitymod$swimHeadBlock(World level, BlockPos pos) {
+        Direction gravityDirection = GravityAPI.getGravityDirection(gravitymod$this());
+        if (gravityDirection == Direction.DOWN) {
+            return level.getBlockState(pos);
+        }
+        return level.getBlockState(BlockPosUtil.containing(
+                this.position().add(RotationUtil.vecPlayerToWorld(0.0D, 0.9D, 0.0D, gravityDirection))));
     }
 
     @Inject(
