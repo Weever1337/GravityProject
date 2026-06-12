@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.math.BlockPos;
 import org.weever.gravitymod.v1_20_1.util.Mth;
 import net.minecraft.util.math.vector.Vector3d;
@@ -264,6 +265,48 @@ public abstract class GravityPlayerMixin extends LivingEntity {
         if (gravitymod$tempStoreYRotShifted){
             gravitymod$tempStoreYRotShifted = false;
             yRot = (gravitymod$tempStoreYRot);
+        }
+    }
+
+    @Inject(
+            method = "getRopeHoldPosition",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void gravitymod$getRopeHoldPosition(float partialTicks, CallbackInfoReturnable<Vector3d> cir) {
+        Direction gravityDirection = GravityAPI.getGravityDirection(this);
+        if (gravityDirection == Direction.DOWN) return;
+
+        double armSide = 0.22D * (this.getMainArm() == HandSide.RIGHT ? -1.0D : 1.0D);
+        float pitchRad = Mth.lerp(partialTicks * 0.5F, this.xRot, this.xRotO) * ((float) Math.PI / 180F);
+        float bodyYawRad = Mth.lerp(partialTicks, this.yBodyRotO, this.yBodyRot) * ((float) Math.PI / 180F);
+        if (this.isFallFlying() || this.isAutoSpinAttack()) {
+            Vector3d localView = RotationUtil.vecWorldToPlayer(this.getViewVector(partialTicks), gravityDirection);
+            Vector3d velocity = this.getDeltaMovement();
+            double horizVelSqr = velocity.x * velocity.x + velocity.z * velocity.z;
+            double horizViewSqr = localView.x * localView.x + localView.z * localView.z;
+            float roll;
+            if (horizVelSqr > 0.0D && horizViewSqr > 0.0D) {
+                double dot = (velocity.x * localView.x + velocity.z * localView.z) / Math.sqrt(horizVelSqr * horizViewSqr);
+                double cross = velocity.x * localView.z - velocity.z * localView.x;
+                roll = (float) (Math.signum(cross) * Math.acos(dot));
+            } else {
+                roll = 0.0F;
+            }
+
+            Vector3d localOffset = new Vector3d(armSide, -0.11D, 0.85D).zRot(-roll).xRot(-pitchRad).yRot(-bodyYawRad);
+            cir.setReturnValue(this.getEyePosition(partialTicks)
+                    .add(RotationUtil.vecPlayerToWorld(localOffset, gravityDirection)));
+        } else if (this.isVisuallySwimming()) {
+            Vector3d localOffset = new Vector3d(armSide, 0.2D, -0.15D).xRot(-pitchRad).yRot(-bodyYawRad);
+            cir.setReturnValue(this.getEyePosition(partialTicks)
+                    .add(RotationUtil.vecPlayerToWorld(localOffset, gravityDirection)));
+        } else {
+            double height = this.getBbHeight() - 1.0D;
+            double forward = this.isCrouching() ? -0.2D : 0.07D;
+            Vector3d localOffset = new Vector3d(armSide, height, forward).yRot(-bodyYawRad);
+            cir.setReturnValue(this.getPosition(partialTicks)
+                    .add(RotationUtil.vecPlayerToWorld(localOffset, gravityDirection)));
         }
     }
 

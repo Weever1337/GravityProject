@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -36,10 +37,31 @@ public abstract class GravityServerPlayNetHandlerImplMixin {
                     target = "Lnet/minecraft/entity/player/ServerPlayerEntity;move(Lnet/minecraft/entity/MoverType;Lnet/minecraft/util/math/vector/Vector3d;)V")
     )
     private void gravitymod$handleMovePlayer(CPlayerPacket $$0, CallbackInfo ci) {
+        gravitymod$preMoveWorldPos = this.player.position();
         Direction gravityDirection = GravityAPI.getGravityDirection(this.player);
         if (gravityDirection == Direction.DOWN)
             return;
         ((IGravityEntity)this.player).gravitymod$setTaggedForFlip(true);
+    }
+
+    @Unique
+    private Vector3d gravitymod$preMoveWorldPos = Vector3d.ZERO;
+
+    @ModifyArg(
+            method = "handleMovePlayer",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/player/ServerPlayerEntity;doCheckFallDamage(DZ)V"
+            ),
+            index = 0
+    )
+    private double gravitymod$localVerticalFallDelta(double worldDeltaY) {
+        Direction gravityDirection = GravityAPI.getGravityDirection(this.player);
+        if (gravityDirection == Direction.DOWN)
+            return worldDeltaY;
+
+        return RotationUtil.vecWorldToPlayer(
+                this.player.position().subtract(gravitymod$preMoveWorldPos), gravityDirection).y;
     }
 
 
