@@ -15,6 +15,7 @@
     "GravityEntityCollisionContextMixin",
     "GravityEntityMixin",
     "GravityFireworkRocketMixin",
+    "GravityFishingBobberMixin",
     "GravityFoxMixin",
     "GravityLivingEntityMixin",
     "GravityMobMixin",
@@ -23,7 +24,6 @@
     "GravityServerPlayNetHandlerImplMixin",
     "GravityThrowableEntityMixin",
     "GravityUseOnContextMixin",
-    "fall_distance.GravityServerPlayerFall",
     "item.GravityBrainUtilMixin"
   ],
   "client": [
@@ -36,6 +36,7 @@
     "client.GravityEntityRendererMixin",
     "client.GravityFishingHookRendererMixin",
     "client.GravityGameRendererMixin",
+    "client.GravityIngameGuiMixin",
     "client.GravityItemParticlePickupMixin",
     "client.GravityLocalPlayerMixin",
     "client.GravityPlayerRendererMixin",
