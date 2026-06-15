@@ -78,6 +78,7 @@ repositories {
     mavenCentral()
     maven { url = "https://repo.spongepowered.org/maven" }
     maven { url = 'https://maven.parchmentmc.org' }
+    maven { url = "https://cursemaven.com"}
 }
 
 dependencies {
@@ -85,6 +86,7 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation 'org.jetbrains:annotations:24.0.0'
     implementation 'org.joml:joml:1.10.5'
+    runtimeOnly(fg.deobf("curse.maven:presence-footsteps-forge-433068:3156583"))
 }
 
 jar {
@@ -119,6 +121,7 @@ jar.finalizedBy('reobfJar')
 mixin {
     add sourceSets.main, "mixins.gravitymod.refmap.json"
     config "mixins.gravitymod.json"
+    config "mixins.gravitymod.presencefootsteps.json"
 }
 
 publishing {

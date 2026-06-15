@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.7",
+  "package": "org.weever.gravitymod.compat.presencefootsteps.mixin",
+  "plugin": "org.weever.gravitymod.compat.GravityCompatMixinPlugin",
+  "refmap": "mixins.gravitymod.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "PFSolverMixin",
+    "PFBipedalStepSoundGeneratorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
